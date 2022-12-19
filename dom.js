@@ -55,13 +55,48 @@
 //     item[i].style.fontWeight="bold"
 // }
 
-var li=document.getElementsByTagName('li');
+// //GET ELEMENTS BY TAG NAME
+// var li=document.getElementsByTagName('li');
 
-li[1].textContent="Hello"
-li[1].style.fontWeight="bold"
-li[1].style.backgroundColor="Yellow"
+// li[1].textContent="Hello"
+// li[1].style.fontWeight="bold"
+// li[1].style.backgroundColor="Yellow"
 
 
- for(var i=0;i<item.length;i++){
-    li[i].style.fontWeight="bold"
- }
+//  for(var i=0;i<item.length;i++){
+//     li[i].style.fontWeight="bold"
+//  }
+
+//QUERY SELECTOR
+// var header=document.querySelector("#main-header");
+// header.style.borderBottom= 'solid 4px #ccc';
+
+// var input=document.querySelector("input") //selects only one
+// input.value="Hello World"
+
+// var submit=document.querySelector('input[type="submit"]')
+// submit.value="Send"
+
+// var item=document.querySelector('.list-group-item')
+// item.style.color='red';
+
+//Changing the background color using queryselector
+var item=document.querySelector('.list-group-item:nth-child(2)')
+item.style.backgroundColor='Green';
+
+//QueryselectorAll for font change
+var listItem=document.querySelectorAll('li');
+//Changing color to lightgreen
+listItem[1].style.color="LightGreen"
+
+//Making list item invisible
+listItem[2].style.display="none"
+
+//making odd items with background green
+var odd=document.querySelectorAll('li:nth-child(odd)');
+
+for(var i=0;i<odd.length;i++){
+    odd[i].style.backgroundColor="Green";
+}
+
+ 
