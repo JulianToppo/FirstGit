@@ -35,4 +35,4 @@
 var item=document.getElementsByClassName('title')
 console.log(item)
 item[0].style.color="Green"
-item[0].style.fontWeight="900"
+item[0].style.fontWeight="bold"
