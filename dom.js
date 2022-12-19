@@ -38,22 +38,30 @@
 // item[0].style.color="Green"
 // item[0].style.fontWeight="bold"
 
-var item=document.getElementsByClassName('list-group-item')
+// var item=document.getElementsByClassName('list-group-item')
 // console.log(item.length)
 // console.log(item[1])
 // item[1].textContent="Hello"
 // item[1].style.fontWeight="bold"
 // item[1].style.backgroundColor="Yellow"
 
-for(var i=0;i<item.length;i++){
-    item[i].style.backgroundColor="#f4f4f4" //making the background color light grey
-}
+// for(var i=0;i<item.length;i++){
+//     item[i].style.backgroundColor="#f4f4f4" //making the background color light grey
+// }
 
-item[2].style.backgroundColor="Green"
+// item[2].style.backgroundColor="Green"
 
-for(var i=0;i<item.length;i++){
-    item[i].style.fontWeight="bold"
-}
+// for(var i=0;i<item.length;i++){
+//     item[i].style.fontWeight="bold"
+// }
+
+var li=document.getElementsByTagName('li');
+
+li[1].textContent="Hello"
+li[1].style.fontWeight="bold"
+li[1].style.backgroundColor="Yellow"
 
 
-
+ for(var i=0;i<item.length;i++){
+    li[i].style.fontWeight="bold"
+ }
