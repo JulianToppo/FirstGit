@@ -9,12 +9,12 @@ function storeValues(e){
     var name=document.getElementById('name');
     var email=document.getElementById('email');
     var phonenumber=document.getElementById('phonenumber');
-    var Dateforcall=document.getElementById('Dateforcall');
-    var Timeforcall=document.getElementById('Timeforcall');
+    var dateForCall=document.getElementById('dateForCall');
+    var timeForCall=document.getElementById('timeForCall');
     
-    console.log(name.value,email.value,phonenumber.value,Dateforcall.value,Timeforcall.val);
+    console.log(name.value,email.value,phonenumber.value,dateForCall.value,timeForCall.val);
 
-    if(name.value === '' || email.value === '' || phonenumber.value==='' || Dateforcall.value==='' || Timeforcall.value==='') {
+    if(name.value === '' || email.value === '' || phonenumber.value==='' || dateForCall.value==='' || timeForCall.value==='') {
         // alert('Please enter all fields');
         msg.classList.add('error');
         msg.innerHTML = 'Please enter all fields';
@@ -22,11 +22,18 @@ function storeValues(e){
         setTimeout(() => msg.remove(), 3000);
       }else{
         //store the values in the local storage
-        localStorage.setItem('name',name.value);
-        localStorage.setItem('email',email.value);
-        localStorage.setItem('phonenumber',phonenumber.value);
-        localStorage.setItem('Dateforcall',Dateforcall.value);
-        localStorage.setItem('Timeforcall',Timeforcall.value);
+        let myObj={
+          "name":name.value,
+          "email":email.value,
+          "phonenumber":phonenumber.value,
+          'dateForCall':dateForCall.value,
+          'timeForCall':timeForCall.value
+
+        }
+
+        myObjString=JSON.stringify(myObj)
+                
+        localStorage.setItem('Entered Value',myObjString);
 
 
       }
