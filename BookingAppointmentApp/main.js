@@ -1,19 +1,18 @@
 var form=document.getElementById('my-form');
 const msg = document.querySelector('.msg');
 
-form.addEventListener('click',storeValues);
+form.addEventListener('submit',storeValues);
 
 function storeValues(e){
     e.preventDefault();
-
+    
     var name=document.getElementById('name');
     var email=document.getElementById('email');
     var phonenumber=document.getElementById('phonenumber');
     var dateForCall=document.getElementById('dateForCall');
     var timeForCall=document.getElementById('timeForCall');
-    
-    console.log(name.value,email.value,phonenumber.value,dateForCall.value,timeForCall.val);
-
+   // console.log(name.value,email.value,phonenumber.value,dateForCall.value,timeForCall.val);
+    var showList;
     if(name.value === '' || email.value === '' || phonenumber.value==='' || dateForCall.value==='' || timeForCall.value==='') {
         // alert('Please enter all fields');
         msg.classList.add('error');
@@ -30,12 +29,34 @@ function storeValues(e){
           'timeForCall':timeForCall.value
 
         }
-
-        myObjString=JSON.stringify(myObj)
-                
-        localStorage.setItem('Entered Value',myObjString);
-
-
+        
+        //storing the values in an array
+        showList = JSON.parse(localStorage.getItem('ListOfEnteredValue') || "[]")
+        showList.push(myObj);
+        localStorage.setItem("ListOfEnteredValue", JSON.stringify(showList));
       }
+     
+      addelements();
+}
 
+//for adding elements after submit button
+function addelements(){
+  showList = JSON.parse(localStorage.getItem('ListOfEnteredValue') || "[]")
+  var ul = document.querySelector(".submit");
+  console.log(ul);
+  var li = document.createElement("div");
+  for(var i=0;i<showList.length;i++){
+    li.appendChild(document.createTextNode(showList[i].name));
+    li.innerHTML += ' ';
+    li.appendChild(document.createTextNode(showList[i].email));
+    li.innerHTML += ' ';
+    li.appendChild(document.createTextNode(showList[i].phonenumber));
+    li.innerHTML += ' ';
+    li.appendChild(document.createTextNode(showList[i].dateForCall));
+    li.innerHTML += ' ';
+    li.appendChild(document.createTextNode(showList[i].timeForCall));
+    li.innerHTML += '<br>';
+    
+  ul.appendChild(li);
+  }
 }
