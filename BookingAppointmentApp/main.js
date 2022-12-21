@@ -1,7 +1,17 @@
 var form=document.getElementById('my-form');
 const msg = document.querySelector('.msg');
 
+//creating unordered list for entries
+var listToAdd=document.createElement('ul');
+listToAdd.className="appendedList";
+form.appendChild(listToAdd);
+
+var listGroup=document.querySelector(".appendedList");
+
+//EVENT LISTENERS
 form.addEventListener('submit',storeValues);
+listGroup.addEventListener('click',deleteList);
+listGroup.addEventListener('click',EditList);
 
 function storeValues(e){
     e.preventDefault();
@@ -30,33 +40,94 @@ function storeValues(e){
 
         }
         
-        //storing the values in an array
-        showList = JSON.parse(localStorage.getItem('ListOfEnteredValue') || "[]")
-        showList.push(myObj);
-        localStorage.setItem("ListOfEnteredValue", JSON.stringify(showList));
+        //storing the values       
+        if(localStorage.getItem(myObj.email)){
+            console.log("Duplicate Entry");
+            removeFromPrintedList(myObj.email);
+            localStorage.removeItem(myObj.email);
+            localStorage.setItem(myObj.email, JSON.stringify(myObj));
+            addelements(myObj);
+        }else{
+          localStorage.setItem(myObj.email, JSON.stringify(myObj));
+          addelements(myObj);
+        }
+        
       }
      
-      addelements();
+     
 }
 
 //for adding elements after submit button
-function addelements(){
-  showList = JSON.parse(localStorage.getItem('ListOfEnteredValue') || "[]")
-  var ul = document.querySelector(".submit");
-  console.log(ul);
-  var li = document.createElement("div");
-  for(var i=0;i<showList.length;i++){
-    li.appendChild(document.createTextNode(showList[i].name));
-    li.innerHTML += ' ';
-    li.appendChild(document.createTextNode(showList[i].email));
-    li.innerHTML += ' ';
-    li.appendChild(document.createTextNode(showList[i].phonenumber));
-    li.innerHTML += ' ';
-    li.appendChild(document.createTextNode(showList[i].dateForCall));
-    li.innerHTML += ' ';
-    li.appendChild(document.createTextNode(showList[i].timeForCall));
-    li.innerHTML += '<br>';
+function addelements(myObj){
+    var ul = document.querySelector(".appendedList");  
+    var li = document.createElement("li");
+    li.style.width="100%";
+    li.class="list-group";
+    li.id=myObj.email;
+  
+    li.appendChild(document.createTextNode(myObj.name));
+    li.appendChild(document.createTextNode(myObj.email));
+    li.appendChild(document.createTextNode(myObj.phonenumber));
+    li.appendChild(document.createTextNode(myObj.dateForCall));
+    li.appendChild(document.createTextNode(myObj.timeForCall));
     
-  ul.appendChild(li);
+
+    var deleteBtn=document.createElement('button');
+
+    deleteBtn.className='btn btn-danger btn-sm float-right delete';
+
+    deleteBtn.appendChild(document.createTextNode('X'));
+
+    //create edit button element
+    var editBtn=document.createElement('button')
+    editBtn.className='btn btn-primary btn-sm float-right edit';
+    editBtn.appendChild(document.createTextNode('Edit'));
+
+    //Append button to li 
+    li.appendChild(deleteBtn);
+    li.appendChild(editBtn);
+    ul.appendChild(li);
+}
+
+function removeFromPrintedList(objEmail){
+  var ul= document.querySelector(".appendedList");
+  var li=document.getElementById(objEmail);
+  if(li){
+    ul.removeChild(li);
+  }else{
+    console.log("Not in the printed list");
   }
+}
+
+function deleteList(e){
+
+  e.preventDefault();
+
+  if(e.target.classList.contains('delete')){
+    if(confirm('Are you sure?')){
+        var li=e.target.parentElement;
+        console.log(li)
+        listGroup.removeChild(li);
+        localStorage.removeItem(li.id);
+    }
+}
+}
+
+function EditList(e){
+  
+  e.preventDefault();
+  if(e.target.classList.contains('edit')){
+    if(confirm('Are you sure?')){
+        var li=e.target.parentElement;
+        console.log(li);
+               
+        document.getElementById("name").value = li.childNodes[0].data;
+        document.getElementById("email").value =li.childNodes[1].data;
+        document.getElementById("phonenumber").value = li.childNodes[2].data;
+        document.getElementById("dateForCall").value= li.childNodes[3].data;
+        document.getElementById("timeForCall").value = li.childNodes[4].data;
+        localStorage.removeItem(li.id);
+        listGroup.removeChild(li);  
+    }
+}
 }
