@@ -26,7 +26,7 @@ const createPost = async (post,callback) => {
             const error=false;
 
             if(!error){
-                resolve();
+                resolve("Post Created");
             }
             else{
                 reject('Error:Something is wrong');
@@ -49,7 +49,7 @@ const deletePost = async () => {
             }
            
             if(!error){
-                resolve();
+                resolve("Post Deleted");
             }
             else{
                 reject('Error:Array is empty');
@@ -94,6 +94,36 @@ createPost({title:'Post Three',body:'This is post three'})
                 }).catch(err => console.log(err));
 */
 
+//Modification using async and wait
+
+async function deletethreeitems(){
+    try{
+    const createNewPost= await createPost({title:'Post Using Await Three',body:'This is post three'});
+    console.log(createNewPost);
+
+    const delfirst=await  deletePost();
+    console.log(delfirst);
+
+    const delsecond=await deletePost();
+    console.log(delsecond);
+
+    const delthird=await deletePost();
+    console.log(delthird);
+
+    const delfourth=await deletePost();
+    console.log(delfourth);
+
+}
+    catch(e){
+
+        console.log(e);
+    }
+}
+
+
+console.log(`deletethreetimescalled: ${deletethreeitems()}`);
+
+
 const promise1= Promise.resolve('Hello World');
 const promise2= 10;
 const promise3 = new Promise((resolve,reject) =>
@@ -121,14 +151,16 @@ function updateLastUserActivityTime(msg,callback){
 });
 }
 
+
 //Updating last activity time and calling multiple promises asynchronously 
-Promise.all([updateLastUserActivityTime('Before Creating'),createPost({title:'Post Three ',body:'This is post three'})])
-.then(() => {
-            console.log(posts),
-            getPosts(),
-            deletePost().then(() => {
-                console.log(posts),
-                updateLastUserActivityTime('After Deleting Three').then(getPosts()).catch(err => console.log(err))
-             }).catch(err => console.log(err))
-        }).catch(err => console.log(err));
+// Promise.all([updateLastUserActivityTime('Before Creating'),createPost({title:'Post Three ',body:'This is post three'})])
+// .then(() => {
+//             console.log(posts),
+//             getPosts(),
+//             deletePost().then(() => {
+//                 console.log(posts),
+//                 updateLastUserActivityTime('After Deleting').then(getPosts()).catch(err => console.log(err))
+//              }).catch(err => console.log(err))
+//         }).catch(err => console.log(err));
     
+      
