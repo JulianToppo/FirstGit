@@ -18,9 +18,9 @@ function getPosts(){
 }
 
 //Creating createpost promise 
-function createPost(post,callback){
+const createPost = async (post,callback) => {
     
-    return new Promise((resolve,reject) => {
+    let postCreation= new Promise((resolve,reject) => {
         setTimeout(()=>{
             posts.push(post);
             const error=false;
@@ -33,11 +33,12 @@ function createPost(post,callback){
             }
         },1000);
 });
+    return await postCreation;
 }
 
 //Creating delete promise 
-function deletePost(){
-    return new Promise((resolve,reject)=>{
+const deletePost = async () => {
+    let delPost= new Promise((resolve,reject)=>{
         setTimeout(()=>{
             let error;
             if(posts.length>=1){
@@ -56,6 +57,9 @@ function deletePost(){
 
         },1000);
     })
+
+    return await delPost;
+
 }
 
 
