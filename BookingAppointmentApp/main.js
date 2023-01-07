@@ -2,8 +2,8 @@
 var form=document.getElementById('my-form');
 const msg = document.querySelector('.msg');
 
-//Adding elements from cloud using get request
-function addElementFromCloud(){
+//Adding elements from cloud using get request using DOMContentLoaded
+window.addEventListener("DOMContentLoaded",()=>{
   axios.get("https://crudcrud.com/api/3dc35771328a48dcb1574f90246a9e05/appointmentData")
   .then((response) => {
       console.log(response.data);
@@ -12,10 +12,9 @@ function addElementFromCloud(){
       });
   })
   .catch((err) => {
-   // document.body.innerHTML=document.body.innerHTML + "<h4>Something Went Wrong</h4>"
     console.log(err);
   })
-}
+});
 
 //creating unordered list for entries
 var listToAdd=document.createElement('ul');
@@ -164,6 +163,3 @@ function EditList(e){
     }
 }
 }
-
-//Function call for loading objects from the crud server 
-addElementFromCloud();
