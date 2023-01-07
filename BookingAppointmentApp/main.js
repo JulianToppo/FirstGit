@@ -4,7 +4,7 @@ const msg = document.querySelector('.msg');
 
 //Adding elements from cloud using get request using DOMContentLoaded
 window.addEventListener("DOMContentLoaded",()=>{
-  axios.get("https://crudcrud.com/api/3dc35771328a48dcb1574f90246a9e05/appointmentData")
+  axios.get("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData")
   .then((response) => {
       console.log(response.data);
       response.data.forEach(element => {
@@ -70,7 +70,7 @@ function storeValues(e){
         */
 
         //STORING OBJECT IN A CLOUD
-        axios.post("https://crudcrud.com/api/3dc35771328a48dcb1574f90246a9e05/appointmentData",myObj)
+        axios.post("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData",myObj)
         .then((response) => {
             console.log(response.data);
             addelements(response.data);
@@ -86,11 +86,12 @@ function storeValues(e){
 
 //for adding elements after submit button
 function addelements(myObj){
+    console.log(myObj._id);
     var ul = document.querySelector(".appendedList");  
     var li = document.createElement("li");
     li.style.width="100%";
     li.class="list-group";
-    li.id=myObj.email;
+    li.id=myObj._id;
   
     li.appendChild(document.createTextNode(myObj.name));
     li.appendChild(document.createTextNode(" "));
@@ -140,7 +141,11 @@ function deleteList(e){
         var li=e.target.parentElement;
         console.log(li)
         listGroup.removeChild(li);
-        localStorage.removeItem(li.id);
+        
+        //localStorage.removeItem(li.id);
+        axios.delete("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData/"+li.id)
+        .then((response)=> console.log(response))
+        .catch((err) => console.log(err));
     }
 }
 }
