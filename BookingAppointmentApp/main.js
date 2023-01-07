@@ -1,10 +1,18 @@
 
 var form=document.getElementById('my-form');
 const msg = document.querySelector('.msg');
+var editOn= false;
+var editId;
+
+function editPostInServer(myObj){
+  axios.put("https://crudcrud.com/api/6a982d65e293466fad6303afc4cd1211/appointmentData"+`/${editId}`,myObj)
+  .then((response)=> console.log(response))
+  .catch((err)=>console.log(err));
+}
 
 //Adding elements from cloud using get request using DOMContentLoaded
 window.addEventListener("DOMContentLoaded",()=>{
-  axios.get("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData")
+  axios.get("https://crudcrud.com/api/6a982d65e293466fad6303afc4cd1211/appointmentData")
   .then((response) => {
       console.log(response.data);
       response.data.forEach(element => {
@@ -69,8 +77,18 @@ function storeValues(e){
         }
         */
 
+        if(editOn == true){
+           editPostInServer(myObj);
+           myObj._id=editId;
+           addelements(myObj);
+           editOn=false;
+           editId=0;
+           return ;
+        }
+        else{
+
         //STORING OBJECT IN A CLOUD
-        axios.post("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData",myObj)
+        axios.post("https://crudcrud.com/api/6a982d65e293466fad6303afc4cd1211/appointmentData",myObj)
         .then((response) => {
             console.log(response.data);
             addelements(response.data);
@@ -80,6 +98,7 @@ function storeValues(e){
           console.log(err);
         })
       }
+    }
      
      
 }
@@ -87,6 +106,7 @@ function storeValues(e){
 //for adding elements after submit button
 function addelements(myObj){
     console.log(myObj._id);
+
     var ul = document.querySelector(".appendedList");  
     var li = document.createElement("li");
     li.style.width="100%";
@@ -120,6 +140,9 @@ function addelements(myObj){
     li.appendChild(deleteBtn);
     li.appendChild(editBtn);
     ul.appendChild(li);
+
+    //reset the values to empty in the form
+    document.getElementById("my-form").reset();
 }
 
 function removeFromPrintedList(objEmail){
@@ -143,7 +166,7 @@ function deleteList(e){
         listGroup.removeChild(li);
         
         //localStorage.removeItem(li.id);
-        axios.delete("https://crudcrud.com/api/9a75343dede34fc9be111d69c31b6112/appointmentData/"+li.id)
+        axios.delete("https://crudcrud.com/api/6a982d65e293466fad6303afc4cd1211/appointmentData/"+li.id)
         .then((response)=> console.log(response))
         .catch((err) => console.log(err));
     }
@@ -163,8 +186,19 @@ function EditList(e){
         document.getElementById("phonenumber").value = li.childNodes[4].data;
         document.getElementById("dateForCall").value= li.childNodes[6].data;
         document.getElementById("timeForCall").value = li.childNodes[8].data;
-        localStorage.removeItem(li.id);
+        //localStorage.removeItem(li.id);
+
+        //alert on ui
+        msg.style="text-align:center; color:blue";
+        msg.innerHTML = 'Editing Form fields';
+        
+        // Remove error after 3 seconds
+        setTimeout(() => msg.remove(), 5000);
+
+        editOn=true;
+        editId=li.id;
         listGroup.removeChild(li);  
     }
 }
+
 }
