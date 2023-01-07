@@ -1,5 +1,21 @@
+
 var form=document.getElementById('my-form');
 const msg = document.querySelector('.msg');
+
+//Adding elements from cloud using get request
+function addElementFromCloud(){
+  axios.get("https://crudcrud.com/api/3dc35771328a48dcb1574f90246a9e05/appointmentData")
+  .then((response) => {
+      console.log(response.data);
+      response.data.forEach(element => {
+        addelements(element);
+      });
+  })
+  .catch((err) => {
+   // document.body.innerHTML=document.body.innerHTML + "<h4>Something Went Wrong</h4>"
+    console.log(err);
+  })
+}
 
 //creating unordered list for entries
 var listToAdd=document.createElement('ul');
@@ -40,7 +56,8 @@ function storeValues(e){
 
         }
         
-        //storing the values       
+        //storing the values 
+        /*      
         if(localStorage.getItem(myObj.email)){
             console.log("Duplicate Entry");
             removeFromPrintedList(myObj.email);
@@ -51,7 +68,18 @@ function storeValues(e){
           localStorage.setItem(myObj.email, JSON.stringify(myObj));
           addelements(myObj);
         }
-        
+        */
+
+        //STORING OBJECT IN A CLOUD
+        axios.post("https://crudcrud.com/api/3dc35771328a48dcb1574f90246a9e05/appointmentData",myObj)
+        .then((response) => {
+            console.log(response.data);
+            addelements(response.data);
+        })
+        .catch((err) => {
+          document.body.innerHTML=document.body.innerHTML + "<h4>Something Went Wrong</h4>"
+          console.log(err);
+        })
       }
      
      
@@ -66,10 +94,15 @@ function addelements(myObj){
     li.id=myObj.email;
   
     li.appendChild(document.createTextNode(myObj.name));
+    li.appendChild(document.createTextNode(" "));
     li.appendChild(document.createTextNode(myObj.email));
+    li.appendChild(document.createTextNode(" "));
     li.appendChild(document.createTextNode(myObj.phonenumber));
+    li.appendChild(document.createTextNode(" "));
     li.appendChild(document.createTextNode(myObj.dateForCall));
+    li.appendChild(document.createTextNode(" "));
     li.appendChild(document.createTextNode(myObj.timeForCall));
+    li.appendChild(document.createTextNode(" "));
     
 
     var deleteBtn=document.createElement('button');
@@ -122,12 +155,15 @@ function EditList(e){
         console.log(li);
                
         document.getElementById("name").value = li.childNodes[0].data;
-        document.getElementById("email").value =li.childNodes[1].data;
-        document.getElementById("phonenumber").value = li.childNodes[2].data;
-        document.getElementById("dateForCall").value= li.childNodes[3].data;
-        document.getElementById("timeForCall").value = li.childNodes[4].data;
+        document.getElementById("email").value =li.childNodes[2].data;
+        document.getElementById("phonenumber").value = li.childNodes[4].data;
+        document.getElementById("dateForCall").value= li.childNodes[6].data;
+        document.getElementById("timeForCall").value = li.childNodes[8].data;
         localStorage.removeItem(li.id);
         listGroup.removeChild(li);  
     }
 }
 }
+
+//Function call for loading objects from the crud server 
+addElementFromCloud();

@@ -153,14 +153,15 @@ function updateLastUserActivityTime(msg,callback){
 
 
 //Updating last activity time and calling multiple promises asynchronously 
-// Promise.all([updateLastUserActivityTime('Before Creating'),createPost({title:'Post Three ',body:'This is post three'})])
-// .then(() => {
-//             console.log(posts),
-//             getPosts(),
-//             deletePost().then(() => {
-//                 console.log(posts),
-//                 updateLastUserActivityTime('After Deleting').then(getPosts()).catch(err => console.log(err))
-//              }).catch(err => console.log(err))
-//         }).catch(err => console.log(err));
+/*
+Promise.all([updateLastUserActivityTime('Before Creating'),createPost({title:'Post Three ',body:'This is post three'})])
+.then(() => {
+            console.log(posts),
+            getPosts(),
+            deletePost().then(() => {
+                console.log(posts),
+                updateLastUserActivityTime('After Deleting').then(getPosts()).catch(err => console.log(err))
+             }).catch(err => console.log(err))
+        }).catch(err => console.log(err));
     
-      
+      */
