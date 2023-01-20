@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <title>Seller Admin Page</title>
+</head>
+<body>
+    <div class="container-sm bg-primary-subtle shadow-sm">
+        <h1 class="text-center">Seller Admin Page</h1>
+        <form>
+            <label for="sellingPrice" class="form-label">Selling Price:</label>
+            <input type="number" id="sellingPrice" class="form-control">
+
+            <label for="productName" class="form-label">Product Name:</label>
+            <input type="text" id="productName" class="form-control">
+
+            <label for="category" class="form-label">Category:</label>
+            <select name="productCategory" id="category">
+                <option value="electronic">Electronic</option>
+                <option value="skincare">Skincare</option>
+                <option value="food">Food</option>
+            </select>
+            
+            <button class="form-control shadow-sm" type="submit" id="submitProducts">Add Product</button>
+        </form>
+    </div>
+    <br>
+    <div class="container-sm bg-secondary-subtle">
+        <h1>Products</h1>
+        <div class="bg-success-subtle" id="productSubsets">
+            <h3>Electronic Items</h3>
+            <ul id="electronicList" class="list-group">
+
+            </ul>
+            <h3>Skincare Items</h3>
+            <ul id="skincareList" class="list-group">
+                
+            </ul>
+            <h3>Food Items</h3>
+            <ul id="foodList" class="list-group">
+                
+            </ul>
+        </div>
+    </div>
+<script src="main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+</body>
+</html>
