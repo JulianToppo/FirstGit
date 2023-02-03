@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded",getAllProducts);
 function getAllProducts(e){
     console.log("inside get all products");
     e.preventDefault(e);
-    axios.get("https://crudcrud.com/api/e2402a509f104fe3abfab7e9976e8234/products")
+    axios.get("https://crudcrud.com/api/553aadfdd06448849465fff082bb5cea/products")
     .then((response) => response.data.forEach(element => {
         addItemsToLists(element);
     }))
@@ -38,7 +38,7 @@ function addItems(e){
             "category":category
         }
         
-        axios.post("https://crudcrud.com/api/e2402a509f104fe3abfab7e9976e8234/products",myObj)
+        axios.post("https://crudcrud.com/api/553aadfdd06448849465fff082bb5cea/products",myObj)
         .then(
             (response)=>
             {
@@ -91,7 +91,7 @@ function deleteProduct(e){
         
         console.log(listEntry.id);
 
-        axios.delete("https://crudcrud.com/api/e2402a509f104fe3abfab7e9976e8234/products/"+listEntry.id)
+        axios.delete("https://crudcrud.com/api/553aadfdd06448849465fff082bb5cea/products/"+listEntry.id)
         .then((response) => console.log(response))
         .catch((err) => console.log(err));
 

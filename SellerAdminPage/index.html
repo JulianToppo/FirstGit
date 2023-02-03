@@ -8,8 +8,8 @@
     <title>Seller Admin Page</title>
 </head>
 <body>
-    <div class="container-sm bg-primary-subtle shadow-sm">
-        <h1 class="text-center">Seller Admin Page</h1>
+    <div class="container-sm bg-primary-subtle shadow-sm rounded">
+        <h1 class="display-2 text-center">Seller Admin Page</h1>
         <form>
             <label for="sellingPrice" class="form-label">Selling Price:</label>
             <input type="number" id="sellingPrice" class="form-control">
@@ -24,13 +24,14 @@
                 <option value="food">Food</option>
             </select>
             
-            <button class="form-control shadow-sm" type="submit" id="submitProducts">Add Product</button>
+            <button class="btn btn-success form-control" type="submit" id="submitProducts">Add Product</button>
+            <br>
         </form>
     </div>
     <br>
-    <div class="container-sm bg-secondary-subtle">
-        <h1>Products</h1>
-        <div class="bg-success-subtle" id="productSubsets">
+    <div class="container bg-primary-subtle rounded">
+        <h1 class="display-2">Products</h1>
+        <div class="container-lg  rounded" id="productSubsets">
             <h3>Electronic Items</h3>
             <ul id="electronicList" class="list-group">
 
