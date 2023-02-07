@@ -7,7 +7,7 @@ const requestHandler=(req,res)=>{
 
     if(url==='/'){
         res.setHeader('Content-Type','text/html');
-        value=fs.readFile('./NodeJS/Server/newmessage.txt', 'utf8', function(err, data){
+        value=fs.readFile('newmessage.txt', 'utf8', function(err, data){
       
             // Display the file content
             res.write('<html>');
@@ -29,7 +29,7 @@ const requestHandler=(req,res)=>{
         req.on('end',()=>{
             const parsedBody= Buffer.concat(body).toString();
             const message=parsedBody.split("=")[1];
-            fs.writeFile('./NodeJS/Server/newmessage.txt',message,err =>{
+            fs.writeFile('newmessage.txt',message,err =>{
                 res.statusCode=302;
                 res.setHeader('Location','/');
                 return res.end() ;
