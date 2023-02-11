@@ -1,14 +1,18 @@
 const express=require('express')
-const path=require('path');
+
 const router=express.Router();
 
+const productController=require('../controller/products')
 
-const rootDir=require('../util/path')
 
-router.get('/',(req,res,next) =>{
-    // console.log('In shop middleware');
-    // res.send('<h1>Hello From Express!</h1>');
-    res.sendFile(path.join(rootDir,'views','shop.html'));
-});
+// router.get('/',(req,res,next) =>{
+//     // console.log('In shop middleware');
+//     // res.send('<h1>Hello From Express!</h1>');
+//     res.sendFile(path.join(rootDir,'views','shop.html'));
+// });
+
+router.get('/', productController.getProducts);
+  
+
 
 module.exports=router;
