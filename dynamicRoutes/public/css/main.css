@@ -74,6 +74,13 @@ form {
 .mobile-nav.open {
   transform: translateX(0);
 }
+.image {
+  max-height: 20rem;
+}
+
+.image img{
+  height: 100%;
+}
 
 .mobile-nav__item-list {
   list-style: none;

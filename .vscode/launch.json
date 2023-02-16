@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}"
+        },
+        
 
         {
             "type": "node",
@@ -13,7 +21,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\NodeJS\\Server\\app.js",
+            "program": "${workspaceFolder}\\BookingAppointmentApp\\app.js",
             "restart": true,
             "runtimeExecutable": "nodemon",
             "console": "integratedTerminal"
