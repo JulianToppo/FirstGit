@@ -13,7 +13,8 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.create({ //save the model in db
+
+  req.user.createProduct({ //save the model in db
     title: title,
     price: price,
     imageUrl: imageUrl,
@@ -40,6 +41,7 @@ exports.postEditProduct = (req,res,next)=>{
     updatedDesc,
     updatedprice);
 
+
   Product.findByPk(prodId)
   .then(product => {
     product.title=updatedtitle;
@@ -64,7 +66,10 @@ exports.getEditProduct = (req, res, next) => {
   }
   const prodId=req.params.productId;
   
-  Product.findByPk(prodId).then(product => {
+  req.user.getProducts({where:{id:prodId}})
+  //Product.findByPk(prodId)
+  .then(products => {
+    const product= products[0];
     if(!product){
       return res.redirect('/');
     }
@@ -80,7 +85,8 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  req.user.getProducts()
+ // Product.findAll()
   .then(products => {
     console.log(products);
     res.render('admin/products', {
@@ -108,8 +114,10 @@ exports.postDeleteProduct = (req, res, next) => {
   //console.log("Julian",req.body.url);
   const prodId = req.params.productId;
   console.log(prodId);
-  Product.findByPk(prodId)
-  .then(product => {
+  req.user.getProducts({where:{id:prodId}})
+  //Product.findByPk(prodId)
+  .then(products => {
+    const product= products[0];
     return product.destroy();
   })
   .then((result) => { //delete
