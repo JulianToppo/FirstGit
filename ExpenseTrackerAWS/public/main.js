@@ -1,38 +1,41 @@
 
-var submitBtn= document.getElementById("submitLoginForm");
-var errorMsg= document.getElementById("errorMsg");
+var submitBtn = document.getElementById("submitLoginForm");
+var errorMsg = document.getElementById("errorMsg");
 
-var SubmitForm= async (e)=>{
-   
-   try{
+var SubmitForm = async (e) => {
 
-  e.preventDefault();
-    
-    let name=document.getElementById('name').value;
-    let email=document.getElementById('email').value;
-    let password=document.getElementById('password').value;
+    try {
 
-    if(email=='' || password=='' || name=='' ){
+        e.preventDefault();
 
-        errorMsg.innerHTML="Please enter the values before submitting"
-        setTimeout(() => errorMsg.remove(), 3000);
-        return;
+        let name = document.getElementById('name').value;
+        let email = document.getElementById('email').value;
+        let password = document.getElementById('password').value;
 
-    }
+        if (email == '' || password == '' || name == '') {
 
-    let myObj={
-        "name":name,
-        "email":email,
-        "password":password
-    };
+            errorMsg.innerHTML = "Please enter the values before submitting"
+            setTimeout(() => errorMsg.remove(), 3000);
+            return;
 
-    axios.post("http://localhost:3000/user/post",myObj)
-    .then(data=>{
+        }
 
-    })
-    }catch(err){
-      console.log(err);
+        let myObj = {
+            "name": name,
+            "email": email,
+            "password": password
+        };
+
+        axios.post("http://localhost:3000/user/post", myObj)
+            .then(data => {
+                console.log(data.data.NewUser);
+            }).catch(err =>{
+                alert("User Already Exists! -"+JSON.stringify(err.response.data.Error.errors[0].message));
+                console.log(err.response.data.Error.errors[0])
+            })
+    } catch (err) {
+         console.log(err);
     }
 }
 
-document.addEventListener("click",SubmitForm);
+submitBtn.addEventListener("click", SubmitForm);
