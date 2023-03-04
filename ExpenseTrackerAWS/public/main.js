@@ -1,8 +1,8 @@
 
-var submitBtn = document.getElementById("submitLoginForm");
+var submitBtn = document.getElementById("submitSignUpForm");
 var errorMsg = document.getElementById("errorMsg");
 
-var SubmitForm = async (e) => {
+var SubmitSignUpForm = async (e) => {
 
     try {
 
@@ -38,4 +38,5 @@ var SubmitForm = async (e) => {
     }
 }
 
-submitBtn.addEventListener("click", SubmitForm);
+
+submitBtn.addEventListener("click", SubmitSignUpForm);
