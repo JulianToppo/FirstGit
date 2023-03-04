@@ -1,6 +1,7 @@
 
 const path = require('path')
 const user = require('../model/user')
+const bcrypt= require('bcrypt');
 
 exports.getLoginPage = (req, res, next) => {
     try {
@@ -12,8 +13,8 @@ exports.getLoginPage = (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
     try {
-        let email = req.body.email;
-        let password = req.body.password;
+        const {email,password} = req.body;
+
 
         if (!email) {
             throw new Error("Email required");
@@ -24,34 +25,38 @@ exports.loginUser = async (req, res, next) => {
             }
         }
 
-
         var data= await user.findAll({where:{
             email:email
         }})
         
 
         if(data.length>=1){
-            data = await user.findAll({
-                where: {
-                    email: email,
-                    password: password
-                }
-            })
+
+            const result=await bcrypt.compare(password,data[0].password);
+
+
+            // data = await user.findAll({
+            //     where: {
+            //         email: email,
+            //         password: password
+            //     }
+            // })
     
-            if (data.length>=1) {
-                res.status(201).json({ Error: "User login sucessful" });
+            // if (data.length>=1) {
+            if(result===true){
+                res.status(201).json({ Message: "User login sucessful" ,success :"true"});
             }
             else {
-                res.status(401).json({ Error: "User not authorized" });
+                res.status(401).json({ Error: "User not authorized" ,success :"false" });
             }
         }
         else{
-            res.status(404).json({ Error: "User not found" });
+            res.status(404).json({ Error: "User not found" ,success :"false"});
         }
 
        
     } catch (err) {
-        res.status(500).json({ Error: err });
+        res.status(500).json({ Error: err ,success :"false"});
     }
 }
 
@@ -65,11 +70,10 @@ exports.getPage = (req, res, next) => {
 
 }
 
-exports.postFormEntry = async (req, res, next) => {
+exports.postSignUpEntry = async (req, res, next) => {
     try {
-        let name = req.body.name;
-        let email = req.body.email;
-        let password = req.body.password;
+        const {name , email ,password} =req.body;
+     
 
         if (!name) {
             throw new Error("Filed Name required");
@@ -82,16 +86,19 @@ exports.postFormEntry = async (req, res, next) => {
                     throw new Error("Filed Password required");
                 }
             }
+            
+            const saltRounds=10;
+            const pass=await bcrypt.hash(password,saltRounds)
 
             const data = await user.create({
                 name: name,
                 email: email,
-                password: password
+                password: pass
             })
 
-            res.status(201).json({ NewUser: data });
+            res.status(201).json({ NewUser: data , success : "true" });
         }
     } catch (err) {
-        res.status(500).json({ Error: err });
+        res.status(500).json({ Error: err ,success :"true"});
     }
 }

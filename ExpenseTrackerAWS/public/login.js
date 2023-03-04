@@ -39,7 +39,7 @@ var SubmitLoginForm = async (e) => {
 
         axios.post("http://localhost:3000/login/", myObj)
             .then(data => {
-                alert("User Login Successful!");
+                alert(JSON.stringify(data.data.Message));
               //  console.log(data.data);
 
             }).catch(err =>{
