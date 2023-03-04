@@ -39,14 +39,14 @@ exports.loginUser = async (req, res, next) => {
             })
     
             if (data.length>=1) {
-                res.status(201).json({ Error: "Login Successful" });
+                res.status(201).json({ Error: "User login sucessful" });
             }
             else {
-                res.status(404).json({ Error: "Password does not exists" });
+                res.status(401).json({ Error: "User not authorized" });
             }
         }
         else{
-            res.status(404).json({ Error: "Email does not exists" });
+            res.status(404).json({ Error: "User not found" });
         }
 
        
