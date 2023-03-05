@@ -38,9 +38,10 @@ var SubmitLoginForm = async (e) => {
         };
 
         axios.post("http://localhost:3000/login/", myObj)
-            .then(data => {
-                alert(JSON.stringify(data.data.Message));
+            .then(result => {
+                alert(JSON.stringify(result.data.Message));
               //  console.log(data.data);
+            localStorage.setItem("token",result.data.token);
              window.location.href = "/expense";
 
             }).catch(err =>{

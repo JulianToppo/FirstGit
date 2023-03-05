@@ -1,6 +1,5 @@
-
-submitExpenseBtn = document.getElementById("expenseSubmitBtn");
-var expenseList = document.getElementById('expenseList')
+var submitExpenseBtn = document.getElementById("expenseSubmitBtn");
+var expenseList = document.getElementById('expenseList');
 
 function showExpenseEntry(myObj){
     try{
@@ -19,6 +18,7 @@ function showExpenseEntry(myObj){
         //Delete button
         var delBtn = document.createElement('button');
         delBtn.id = "deleteBtn";
+        delBtn.className="delete";
         delBtn.appendChild(document.createTextNode('DELETE'));
 
         li.appendChild(delBtn);
@@ -32,7 +32,8 @@ function showExpenseEntry(myObj){
 const loadExpenseData=(e) => { 
     try{
         e.preventDefault();
-        axios.get("http://localhost:3000"+"/expense/getExpense")
+        let token=localStorage.getItem("token");
+        axios.get("http://localhost:3000"+"/expense/getExpense",{ headers : {"Authorization":token}})
         .then(result =>{
             result.data.ExpenseEntries.forEach(data =>{
                 showExpenseEntry(data);
@@ -66,7 +67,8 @@ const addExpense = (e) => {
                 "category": category
             };
 
-            axios.post("http://localhost:3000"+"/expense/addExpense", myObj)
+            let token=localStorage.getItem("token");
+            axios.post("http://localhost:3000"+"/expense/addExpense", myObj,{ headers : {"Authorization":token}})
                 .then(data => {
                     //alert(JSON.stringify(data.data.Message));
                     //  console.log(data.data);
@@ -84,5 +86,36 @@ const addExpense = (e) => {
     }
 }
 
+const deleteItems = async (e) => {
+
+    try {
+        console.log('Inside delete function')
+        e.preventDefault(e);
+        if (e.target.classList.contains('delete')) {
+            if (confirm('Are you sure?')) {
+                var li = e.target.parentElement;
+                console.log(li)
+                //localStorage.removeItem(li.id);
+                
+                let token=localStorage.getItem("token");
+                axios.delete("http://localhost:3000/expense/" + li.id, { headers : {"Authorization":token}} )
+                    .then(
+                        (result) => {
+                            console.log("Entry Deleted")
+                            console.log(result.data.Delete);
+                        }
+                    )
+
+                    expenseList.removeChild(li);
+            }
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded",loadExpenseData);
 submitExpenseBtn.addEventListener("click", addExpense);
+expenseList.addEventListener("click",deleteItems);

@@ -10,8 +10,10 @@ exports.getExpensePage = (req, res, next) => {
     }
 }
 
+
 exports.addExpense = async (req, res, next) => {
     try {
+        console.log("inside add expense");
         const { expenseAmount, description, category } = req.body;
         if (!expenseAmount) {
             throw new Error("Filed expenseAmount required");
@@ -27,7 +29,8 @@ exports.addExpense = async (req, res, next) => {
             const data = await Expense.create({
                 expenseAmount: expenseAmount,
                 description: description,
-                category: category
+                category: category,
+                registeredUserId:req.user.id
             })
 
             res.status(201).json({ NewExpenseEntry: data, success: "true" });
@@ -40,10 +43,30 @@ exports.addExpense = async (req, res, next) => {
 exports.getExpense =  async (req, res, next) => {
     try{
         console.log("get expense entries ");
-        const data = await Expense.findAll();
+        const data = await Expense.findAll({where: { registeredUserId:req.user.id}});
         res.status(200).json({ ExpenseEntries: data })
     } catch (err) {
         res.status(500).json({ Error: err });
     }
 
+}
+
+exports.deleteExpense = (req, res, next) => {
+    try {
+        console.log("inside delete expense function");
+        const expenseId = req.params.expenseId;
+        console.log(expenseId);
+        const data = Expense.destroy({
+            where: {
+                id: expenseId
+            }
+        });
+        res.status(200).json({ Delete: data });
+        // .catch(err => console.log(err));
+    } catch (err) {
+        res.status(500)
+            .json({
+                error: err
+            })
+    }
 }

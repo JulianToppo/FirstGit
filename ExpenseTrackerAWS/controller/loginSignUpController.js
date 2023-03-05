@@ -2,6 +2,11 @@
 const path = require('path')
 const user = require('../model/user')
 const bcrypt= require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+function generateToken(id){
+    return jwt.sign({userID:id},"secretkey");
+}
 
 exports.getLoginPage = (req, res, next) => {
     try {
@@ -44,7 +49,8 @@ exports.loginUser = async (req, res, next) => {
     
             // if (data.length>=1) {
             if(result===true){
-                res.status(201).json({ Message: "User login sucessful" ,success :"true"});
+                
+                res.status(201).json({ Message: "User login sucessful" ,success :"true" ,token : generateToken(data[0].id)});
           
             }
             else {

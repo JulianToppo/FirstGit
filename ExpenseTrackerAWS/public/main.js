@@ -29,6 +29,7 @@ var SubmitSignUpForm = async (e) => {
         axios.post("http://localhost:3000/user/post", myObj)
             .then(data => {
                 console.log(data.data.NewUser);
+                window.location.href="/";
             }).catch(err =>{
                 alert("User Already Exists! -"+JSON.stringify(err.response.data.Error.errors[0].message));
                 console.log(err.response.data.Error.errors[0])
