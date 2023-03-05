@@ -1,104 +1,49 @@
 
-const path = require('path')
-const user = require('../model/user')
-const bcrypt= require('bcrypt');
+const path = require("path");
+const Expense = require("../model/expense");
 
-exports.getLoginPage = (req, res, next) => {
+exports.getExpensePage = (req, res, next) => {
     try {
-        res.sendFile(path.join(__dirname, "..", "view", "login.html"));
+        res.sendFile(path.join(__dirname, "..", "view", "expense.html"));
     } catch (err) {
         res.status(500).json({ Error: err });
     }
 }
 
-exports.loginUser = async (req, res, next) => {
+exports.addExpense = async (req, res, next) => {
     try {
-        const {email,password} = req.body;
-
-
-        if (!email) {
-            throw new Error("Email required");
+        const { expenseAmount, description, category } = req.body;
+        if (!expenseAmount) {
+            throw new Error("Filed expenseAmount required");
         } else {
-
-            if (!password) {
-                throw new Error("Password required");
-            }
-        }
-
-        var data= await user.findAll({where:{
-            email:email
-        }})
-        
-
-        if(data.length>=1){
-
-            const result=await bcrypt.compare(password,data[0].password);
-
-
-            // data = await user.findAll({
-            //     where: {
-            //         email: email,
-            //         password: password
-            //     }
-            // })
-    
-            // if (data.length>=1) {
-            if(result===true){
-                res.status(201).json({ Message: "User login sucessful" ,success :"true"});
-            }
-            else {
-                res.status(401).json({ Error: "User not authorized" ,success :"false" });
-            }
-        }
-        else{
-            res.status(404).json({ Error: "User not found" ,success :"false"});
-        }
-
-       
-    } catch (err) {
-        res.status(500).json({ Error: err ,success :"false"});
-    }
-}
-
-
-exports.getPage = (req, res, next) => {
-    try {
-        res.sendFile(path.join(__dirname, "..", "view", "signUp.html"));
-    } catch (err) {
-        res.status(500).json({ Error: err });
-    }
-
-}
-
-exports.postSignUpEntry = async (req, res, next) => {
-    try {
-        const {name , email ,password} =req.body;
-     
-
-        if (!name) {
-            throw new Error("Filed Name required");
-        } else {
-            if (!email) {
-                throw new Error("Filed Email required");
+            if (!description) {
+                throw new Error("Filed description required");
             } else {
-
-                if (!password) {
-                    throw new Error("Filed Password required");
+                if (!category) {
+                    throw new Error("Filed category required");
                 }
             }
-            
-            const saltRounds=10;
-            const pass=await bcrypt.hash(password,saltRounds)
 
-            const data = await user.create({
-                name: name,
-                email: email,
-                password: pass
+            const data = await Expense.create({
+                expenseAmount: expenseAmount,
+                description: description,
+                category: category
             })
 
-            res.status(201).json({ NewUser: data , success : "true" });
+            res.status(201).json({ NewExpenseEntry: data, success: "true" });
         }
     } catch (err) {
-        res.status(500).json({ Error: err ,success :"true"});
+        res.status(500).json({ Error: err, success: "false" });
     }
+}
+
+exports.getExpense =  async (req, res, next) => {
+    try{
+        console.log("get expense entries ");
+        const data = await Expense.findAll();
+        res.status(200).json({ ExpenseEntries: data })
+    } catch (err) {
+        res.status(500).json({ Error: err });
+    }
+
 }

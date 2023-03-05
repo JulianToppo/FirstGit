@@ -41,6 +41,7 @@ var SubmitLoginForm = async (e) => {
             .then(data => {
                 alert(JSON.stringify(data.data.Message));
               //  console.log(data.data);
+             window.location.href = "/expense";
 
             }).catch(err =>{
                 loginError.innerHTML=JSON.stringify(err.response.data.Error);
