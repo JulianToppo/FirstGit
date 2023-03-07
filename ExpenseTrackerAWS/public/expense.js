@@ -1,5 +1,6 @@
 var submitExpenseBtn = document.getElementById("expenseSubmitBtn");
 var expenseList = document.getElementById('expenseList');
+var buyPremiumBtn= document.getElementById('buyMembership');
 
 function showExpenseEntry(myObj){
     try{
@@ -115,7 +116,46 @@ const deleteItems = async (e) => {
     }
 }
 
+const buyPremiumMembership= async (e) =>{
+
+    try {
+        e.preventDefault();
+        const token = localStorage.getItem('token')
+        const response  = await axios.get('http://localhost:3000/purchase/premiummembership', { headers: {"Authorization" : token} });
+        console.log(response);
+        var options =
+        {
+         "key": response.data.key_id, // Enter the Key ID generated from the Dashboard
+         "order_id": response.data.order.id,// For one time payment
+         // This handler function will handle the success payment
+         "handler": async function (response) {
+            const res = await axios.post('http://localhost:3000/purchase/updatetransactionstatus',{
+                 order_id: options.order_id,
+                 payment_id: response.razorpay_payment_id,
+             }, { headers: {"Authorization" : token} })
+            
+            console.log(res)
+             alert('You are a Premium User Now')
+             //hide the button and show premium user
+             document.getElementById('buyMembership').style.visibility = "hidden"
+             document.getElementById('message').innerHTML = "You are a premium user ";
+            }
+        }
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+        e.preventDefault();
+      
+        rzp1.on('payment.failed', function (response){
+          console.log(response)
+          alert('Something went wrong')
+       });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded",loadExpenseData);
 submitExpenseBtn.addEventListener("click", addExpense);
 expenseList.addEventListener("click",deleteItems);
+buyPremiumBtn.addEventListener("click",buyPremiumMembership);
