@@ -39,10 +39,10 @@ const purchasepremium =async (req, res) => {
         const { payment_id, order_id} = req.body;
         const order  = await Order.findOne({where : {orderid : order_id}}) 
         const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}) 
-        const promise2 =  req.user.update({ ispremiumuser: true }) 
+        const promise2 =  req.user.update({ ispremiumuser: true }) ;
 
         Promise.all([promise1, promise2]).then(()=> {
-            return res.status(202).json({sucess: true, message: "Transaction Successful", token: loginSignUpController.generateAccessToken(userId,undefined , true) });
+            return res.status(202).json({success: true, message: "Transaction Successful", token: loginSignUpController.generateToken(userId,true) });
         }).catch((error ) => {
             throw new Error(error)
         })
@@ -51,12 +51,27 @@ const purchasepremium =async (req, res) => {
                 
     } catch (err) {
         console.log(err);
-        res.status(403).json({ errpr: err, message: 'Sometghing went wrong' })
+        res.status(403).json({ error: err, message: 'Something went wrong' })
 
+    }
+}
+
+var checkIfPremium = async (req,res,next)=>{
+    try {
+        console.log("Check premium method");
+     
+       // const userId = req.user.id;
+        
+        if(req.user.ispremiumuser){
+            res.status(202).json({success: true});
+        }
+    } catch (err) {
+        res.status(403).json({ error: err, message: 'Not a premium user' })
     }
 }
 
 module.exports = {
     purchasepremium,
-    updateTransactionStatus
+    updateTransactionStatus,
+    checkIfPremium
 }

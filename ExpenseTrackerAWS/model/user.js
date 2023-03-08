@@ -21,7 +21,8 @@ const User= sequelize.define('registeredUser',{
     password:{
         type:Sequelize.STRING,
         allowNull: false
-    }
+    },
+    ispremiumuser :Sequelize.BOOLEAN
 })
 
 module.exports=User;

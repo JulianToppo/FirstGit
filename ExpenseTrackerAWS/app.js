@@ -3,6 +3,7 @@ const express= require('express');
 const loginSignUpRoutes= require('./routes/loginsignup');
 const expenseRoutes= require('./routes/expense');
 const purchaseRoutes = require('./routes/purchasePremium')
+const premiumRoutes = require('./routes/premium');
 const path=require('path');
 const bodyParser=require('body-parser')
 const sequelize=require('./util/database')
@@ -28,6 +29,7 @@ order.belongsTo(user);
 app.use('/',loginSignUpRoutes);
 app.use('/expense',expenseRoutes);
 app.use('/purchase',purchaseRoutes);
+app.use('/',premiumRoutes);
 //sql sync 
 sequelize.sync().then(result => {
     // console.log(result);

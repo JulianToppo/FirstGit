@@ -139,6 +139,8 @@ const buyPremiumMembership= async (e) =>{
              //hide the button and show premium user
              document.getElementById('buyMembership').style.visibility = "hidden"
              document.getElementById('message').innerHTML = "You are a premium user ";
+             localStorage.setItem('token', res.data.token);
+             showLeaderboard();
             }
         }
         const rzp1 = new Razorpay(options);
@@ -154,8 +156,45 @@ const buyPremiumMembership= async (e) =>{
     }
 }
 
+function checkIfPremium(e){
+    try {
+        e.preventDefault();
+        let token=localStorage.getItem("token");
+        axios.get("http://localhost:3000"+"/purchase/checkPremium",{ headers : {"Authorization":token}})
+        .then(response =>{
+            console.log(response.data);
+            if(response.data.success=== true){
+                document.getElementById('buyMembership').style.visibility = "hidden"
+                document.getElementById('message').innerHTML = "You are a premium user ";
+                showLeaderboard();
+            }
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function showLeaderboard(){
+    const inputElement = document.createElement("input");
+    inputElement.type = "button";
+    inputElement.value = 'Show Leaderboard'
+    inputElement.onclick = async() => {
+        const token = localStorage.getItem('token')
+        const userLeaderBoardArray = await axios.get('http://localhost:3000/premium/showLeaderBoard', { headers: {"Authorization" : token} })
+        console.log(userLeaderBoardArray.data)
+
+        var leaderboardElem = document.getElementById('leaderboard')
+        leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
+        userLeaderBoardArray.data.forEach((userDetails) => {
+            leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.total_cost || 0} </li>`
+        })
+    }
+    document.getElementById("message").appendChild(inputElement);
+
+}
 
 document.addEventListener("DOMContentLoaded",loadExpenseData);
+document.addEventListener("DOMContentLoaded",checkIfPremium);
 submitExpenseBtn.addEventListener("click", addExpense);
 expenseList.addEventListener("click",deleteItems);
 buyPremiumBtn.addEventListener("click",buyPremiumMembership);
