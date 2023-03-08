@@ -4,11 +4,11 @@ const user = require('../model/user')
 const bcrypt= require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-function generateToken(id){
-    return jwt.sign({userID:id},"secretkey");
+var generateToken = (id,ispremiumuser) => {
+    return jwt.sign({userID:id,ispremiumuser:ispremiumuser},"secretkey");
 }
 
-exports.getLoginPage = (req, res, next) => {
+var getLoginPage = (req, res, next) => {
     try {
         res.sendFile(path.join(__dirname, "..", "view", "login.html"));
     } catch (err) {
@@ -16,7 +16,7 @@ exports.getLoginPage = (req, res, next) => {
     }
 }
 
-exports.loginUser = async (req, res, next) => {
+var loginUser = async (req, res, next) => {
     try {
         const {email,password} = req.body;
 
@@ -50,7 +50,7 @@ exports.loginUser = async (req, res, next) => {
             // if (data.length>=1) {
             if(result===true){
                 
-                res.status(201).json({ Message: "User login sucessful" ,success :"true" ,token : generateToken(data[0].id)});
+                res.status(201).json({ Message: "User login sucessful" ,success :"true" ,token : generateToken(data[0].id,false)});
           
             }
             else {
@@ -70,7 +70,7 @@ exports.loginUser = async (req, res, next) => {
 }
 
 
-exports.getPage = (req, res, next) => {
+var getPage = (req, res, next) => {
     try {
         res.sendFile(path.join(__dirname, "..", "view", "signUp.html"));
     } catch (err) {
@@ -79,7 +79,7 @@ exports.getPage = (req, res, next) => {
 
 }
 
-exports.postSignUpEntry = async (req, res, next) => {
+var postSignUpEntry = async (req, res, next) => {
     try {
         const {name , email ,password} =req.body;
      
@@ -102,7 +102,8 @@ exports.postSignUpEntry = async (req, res, next) => {
             const data = await user.create({
                 name: name,
                 email: email,
-                password: pass
+                password: pass,
+                ispremiumuser:false
             })
 
             res.status(201).json({ NewUser: data , success : "true" });
@@ -110,4 +111,12 @@ exports.postSignUpEntry = async (req, res, next) => {
     } catch (err) {
         res.status(500).json({ Error: err ,success :"false"});
     }
+}
+
+module.exports ={
+    generateToken,
+    getLoginPage,
+    loginUser,
+    getPage,
+    postSignUpEntry
 }
