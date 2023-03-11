@@ -33,6 +33,9 @@ exports.addExpense = async (req, res, next) => {
                 registeredUserId:req.user.id
             })
 
+            console.log(typeof(expenseAmount) , typeof(req.user.totalExpense));
+            const totalExpense= (+req.user.totalExpense) + (+expenseAmount);
+            const updateUseExpense= await req.user.update({totalExpense :totalExpense });
             res.status(201).json({ NewExpenseEntry: data, success: "true" });
         }
     } catch (err) {
