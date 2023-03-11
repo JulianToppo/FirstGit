@@ -7,7 +7,7 @@ const loginSignUpController = require('./loginSignUpController')
 const purchasepremium =async (req, res) => {
     try {
         console.log("purchase premium entered");
-        console.log("cwd",process.env.RAZORPAY_KEY_ID);
+       // console.log("cwd",process.env.RAZORPAY_KEY_ID);
         // console.log("environment",process.env);
 
         var rzp = new Razorpay({
