@@ -1,4 +1,5 @@
 var LoginBtn = document.getElementById("submitLoginForm");
+var forgotPassword = document.getElementById("forgotPassword");
 //var openSignUp = document.getElementById("signUpPage");
 var loginError = document.getElementById("loginError");
 var errorMsg = document.getElementById("errorMsg");
@@ -53,6 +54,15 @@ var SubmitLoginForm = async (e) => {
     }
 }
 
+var  forgotPasswordForm = (e)=>{
+    try {
+        e.preventDefault();
+        window.location.href= "/forgotPassword";
+    } catch (error) {
+        console.log(err);
+    }
+}
 
 LoginBtn.addEventListener("click", SubmitLoginForm);
+forgotPassword.addEventListener("click", forgotPasswordForm);
 //openSignUp.addEventListener("click", OpenSignUp);
