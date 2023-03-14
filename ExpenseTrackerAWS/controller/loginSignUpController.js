@@ -3,6 +3,7 @@ const path = require('path')
 const user = require('../model/user')
 const bcrypt= require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mail = require('../middleware/sendMails');
 
 var generateToken = (id,ispremiumuser) => {
     return jwt.sign({userID:id,ispremiumuser:ispremiumuser},"secretkey");
@@ -113,10 +114,34 @@ var postSignUpEntry = async (req, res, next) => {
     }
 }
 
+var forgotCredentials = (req, res, next) => {
+    try {
+        res.sendFile(path.join(__dirname, "..", "view", "forgotPassword.html"));
+    } catch (err) {
+        res.status(500).json({ Error: err });
+    }
+}
+
+var forgotPassword = (req, res, next) => {
+    try {
+        
+        console.log("inside forgot password");
+        const email= req.body.emailId;
+        console.log("email",email);
+        mail.sendMails(email);
+
+        res.status(200).json({message: "Password Resetting mail sent",success : "true"});
+    
+
+    } catch (error) {
+        res.status(500).json({ Error: err });
+    }
+}
+
 module.exports ={
     generateToken,
     getLoginPage,
     loginUser,
     getPage,
-    postSignUpEntry
+    postSignUpEntry,forgotCredentials,forgotPassword
 }
