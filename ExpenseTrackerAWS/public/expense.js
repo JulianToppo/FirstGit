@@ -95,11 +95,11 @@ const deleteItems = async (e) => {
         if (e.target.classList.contains('delete')) {
             if (confirm('Are you sure?')) {
                 var li = e.target.parentElement;
-                console.log(li)
+             
                 //localStorage.removeItem(li.id);
                 
                 let token=localStorage.getItem("token");
-                axios.delete("http://localhost:3000/expense/" + li.id, { headers : {"Authorization":token}} )
+                axios.delete("http://localhost:3000/expense/" + li.id,{headers : {"Authorization":token}} )
                     .then(
                         (result) => {
                             console.log("Entry Deleted")
@@ -184,6 +184,11 @@ function showLeaderboard(){
         console.log(userLeaderBoardArray.data)
 
         var leaderboardElem = document.getElementById('leaderboard')
+        
+        while (leaderboardElem.firstChild) {
+            leaderboardElem.removeChild(leaderboardElem.firstChild);
+        }
+
         leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
         userLeaderBoardArray.data.forEach((userDetails) => {
             leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpense || 0} </li>`
