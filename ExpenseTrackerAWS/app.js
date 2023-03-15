@@ -10,6 +10,7 @@ const sequelize=require('./util/database')
 const user= require('./model/user');
 const expense= require('./model/expense');
 const order= require('./model/order');
+const forgotPasswordRequests = require('./model/forgotPasswordRequests')
 const app=express();
 const dotenv = require('dotenv');
 
@@ -25,6 +26,9 @@ expense.belongsTo(user);
 
 user.hasMany(order);
 order.belongsTo(user);
+
+user.hasMany(forgotPasswordRequests);
+forgotPasswordRequests.belongsTo(user);
 
 app.use('/',loginSignUpRoutes);
 app.use('/expense',expenseRoutes);

@@ -1,7 +1,7 @@
 const Sib = require('sib-api-v3-sdk')
 require('dotenv').config()
 
-exports.sendMails = async(mail) => {
+exports.sendMails = async(mail,message) => {
     const client = Sib.ApiClient.instance
     const apiKey = client.authentications['api-key']
     apiKey.apiKey = process.env.API_KEY
@@ -19,16 +19,16 @@ exports.sendMails = async(mail) => {
         .sendTransacEmail({
             sender,
             to: receivers,
-            subject: 'Subscribe to Cules Coding to become a developer',
+            subject: 'Reset your password',
             textContent: `
-        Cules Coding will teach you how to become {{params.role}} a developer.
+        Reset your password Mail.
         `,
             htmlContent: `
-        <h1>Cules Coding</h1>
-        <a href="https://cules-coding.vercel.app/">Visit</a>
+        <h1>Reset Link :</h1>
+        <a href=" {{params.resetLink}}">Click on this link to reset password </a>
                 `,
             params: {
-                role: 'Frontend',
+                resetLink: message,
             },
         })
         .then((data) => console.log(data))
