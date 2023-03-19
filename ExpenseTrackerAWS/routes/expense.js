@@ -12,4 +12,9 @@ router.get("/getExpense",authorization.authorizationUser,expenseController.getEx
 
 router.delete("/:expenseId",authorization.authorizationUser,expenseController.deleteExpense);
 
+// router.get("/showReports",authorization.authorizationUser,expenseController.showReports)
+router.get("/user/download",authorization.authorizationUser,expenseController.downloadExpense);
+router.get("/getDownloadedFiles",authorization.authorizationUser,expenseController.getDownloadedFiles);
+
+
 module.exports=router;

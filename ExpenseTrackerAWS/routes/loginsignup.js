@@ -16,4 +16,6 @@ router.post("/called/password/forgotpassword",loginSignUpController.forgotPasswo
 router.get("/password/resetpassword/:id",loginSignUpController.resetPassword);
 router.post("/password/updatePassword",loginSignUpController.updatePassword);
 
+
+
 module.exports=router;
