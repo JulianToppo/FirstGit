@@ -100,8 +100,7 @@ const loadExpenseData = async (e) => {
     try {
         e.preventDefault();
         
-        const rowCount= document.getElementById('numberOfExpenses').value;
-        localStorage.setItem('rowCount',rowCount);
+        const rowCount=localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
         const pageNo = 1;
         await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
