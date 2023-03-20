@@ -6,6 +6,8 @@ var downloadedFilesList = document.getElementById('downloadedFiles');
 
 function showExpenseEntry(myObj) {
     try {
+
+        
         let li = document.createElement("li");
         li.id = myObj.id;
 
@@ -50,20 +52,85 @@ function showDownloadedFiles(myObj) {
     }
 }
 
+const showPagination = ({currpage,hasNext,next,hasPrevious,previous,last}) => {
+    try {
+        console.log("inside show pagination");
+
+        const showPaginationList= document.getElementById("pagination");
+        showPaginationList.innerHTML='';
+
+        if(hasPrevious)
+        {
+        let btn= document.createElement('button');
+        btn.id=previous;
+        btn.addEventListener('click',()=>{
+            getProducts(previous)
+        });
+        btn.innerHTML=previous;
+        showPaginationList.appendChild(btn);
+        }
+
+        let btn= document.createElement('button');
+        btn.id=currpage;
+        btn.innerHTML=currpage;
+        btn.addEventListener('click',()=>{
+            getProducts(currpage)
+        });
+
+        showPaginationList.appendChild(btn);
+
+        if(hasNext){
+            let btn= document.createElement('button');
+            btn.id=next;
+            btn.addEventListener('click',()=>{
+                getProducts(next)
+            });
+            btn.innerHTML=next;
+            showPaginationList.appendChild(btn);
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 const loadExpenseData = async (e) => {
     try {
         e.preventDefault();
         let token = localStorage.getItem("token");
-        await axios.get("http://localhost:3000" + "/expense/getExpense", { headers: { "Authorization": token } })
+        const pageNo = 1;
+        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`, { headers: { "Authorization": token } })
             .then(result => {
+                console.log("result from load expense data recived")
+                expenseList.innerHTML='';
                 result.data.ExpenseEntries.forEach(data => {
-                    showExpenseEntry(data);
-                })
+                    showExpenseEntry(data);  
+                });
+                showPagination(result.data.paginationValues);
             });
     } catch (err) {
         console.log(err);
     }
 }
+
+const getProducts= async (pageNo)=>{
+    try {
+ 
+        let token = localStorage.getItem("token");
+        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`, { headers: { "Authorization": token } })
+            .then(result => {
+                expenseList.innerHTML='';
+                result.data.ExpenseEntries.forEach(data => {
+                    showExpenseEntry(data);
+                })
+                showPagination(result.data.paginationValues);
+            });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 
 const addExpense = (e) => {
 
@@ -106,6 +173,8 @@ const addExpense = (e) => {
         console.log(err);
     }
 }
+
+
 
 const deleteItems = async (e) => {
 
@@ -233,7 +302,7 @@ function showLeaderboard() {
 //     }
 // }
 
-async function  download() {
+async function download() {
     const token = localStorage.getItem('token')
     axios.get('http://localhost:3000/expense/user/download', { headers: { "Authorization": token } })
         .then((response) => {

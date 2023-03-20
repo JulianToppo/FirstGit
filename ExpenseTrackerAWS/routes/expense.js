@@ -8,7 +8,7 @@ const authorization =require('../middleware/authorization');
 
 router.get("/",expenseController.getExpensePage);
 router.post("/addExpense",authorization.authorizationUser,expenseController.addExpense);
-router.get("/getExpense",authorization.authorizationUser,expenseController.getExpense);
+router.get("/getExpense/pageNo/:pageNo",authorization.authorizationUser,expenseController.getExpense);
 
 router.delete("/:expenseId",authorization.authorizationUser,expenseController.deleteExpense);
 

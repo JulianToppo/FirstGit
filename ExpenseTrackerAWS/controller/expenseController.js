@@ -60,8 +60,22 @@ exports.addExpense = async (req, res, next) => {
 exports.getExpense = async (req, res, next) => {
     try {
         console.log("get expense entries ");
-        const data = await Expense.findAll({ where: { registeredUserId: req.user.id } });
-        res.status(200).json({ ExpenseEntries: data })
+        const pageNo= req.params.pageNo;
+        const totalCount= await Expense.count();
+        const lastPage= Math.floor(totalCount/3)+1;
+        const data = await Expense.findAll({ 
+            where: { registeredUserId: req.user.id },
+            limit:3,
+            offset:(Number(pageNo)-1)*3
+         });
+        res.status(200).json({ ExpenseEntries: data , paginationValues: {
+            currpage : pageNo,
+            hasNext:pageNo<lastPage,
+            next:Number(pageNo)+1,
+            hasPrevious:pageNo>1,
+            previous:pageNo-1,
+            last:lastPage
+        }})
     } catch (err) {
         res.status(500).json({ Error: err });
     }
