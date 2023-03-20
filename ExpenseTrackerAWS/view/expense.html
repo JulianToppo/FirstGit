@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense</title>
 </head>
-<body> 
-     <div id="errorMsg"></div>
+
+<body>
+    <div id="errorMsg"></div>
     <form method="POST">
-      
+
         <label for="expenseAmount">Choose expenseAmount</label>
         <input type="number" id="expenseAmount" placeholder="Enter expenseAmount" required>
 
@@ -23,24 +25,35 @@
             <option value="vegetables">Vegetables</option>
             <option value="beverages">Beverages</option>
         </select>
-        <button type="submit" id="expenseSubmitBtn" >Add Expense</button>
+        <button type="submit" id="expenseSubmitBtn">Add Expense</button>
     </form>
-        <br>
-        <button id="buyMembership">Buy membership</button>
-        <button id="showReports" onclick="download()">Download File</button>
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <div id="message" >
+    <br>
+    <button id="buyMembership">Buy membership</button>
+    <button id="showReports" onclick="download()">Download File</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <div id="message">
 
-        </div>
+    </div>
     <div>
+        <br>
+        <form>
+            <label for="numberOfExpenses">No of Expense Rows:</label>
+            <select name="numberOfExpenses" id="numberOfExpenses">
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+            <input type="submit" id="showExpenses" value="Show Expenses">
+        </form>
         <ul id="expenseList">
-            
+
+
         </ul>
         <div id="pagination">
 
         </div>
         <ul id="leaderboard">
-            
+
         </ul>
 
         <h4> Dowloaded Files </h4>
@@ -51,4 +64,5 @@
 </body>
 <script src="/expense.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+
 </html>

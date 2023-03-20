@@ -3,6 +3,7 @@ var expenseList = document.getElementById('expenseList');
 var buyPremiumBtn = document.getElementById('buyMembership');
 var downloadedFilesList = document.getElementById('downloadedFiles');
 
+var showExpenses = document.getElementById('showExpenses');
 
 function showExpenseEntry(myObj) {
     try {
@@ -98,9 +99,12 @@ const showPagination = ({currpage,hasNext,next,hasPrevious,previous,last}) => {
 const loadExpenseData = async (e) => {
     try {
         e.preventDefault();
+        
+        const rowCount= document.getElementById('numberOfExpenses').value;
+        localStorage.setItem('rowCount',rowCount);
         let token = localStorage.getItem("token");
         const pageNo = 1;
-        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`, { headers: { "Authorization": token } })
+        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
                 console.log("result from load expense data recived")
                 expenseList.innerHTML='';
@@ -116,9 +120,9 @@ const loadExpenseData = async (e) => {
 
 const getProducts= async (pageNo)=>{
     try {
- 
+        const rowCount=localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
-        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`, { headers: { "Authorization": token } })
+        await axios.get("http://localhost:3000" + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
                 expenseList.innerHTML='';
                 result.data.ExpenseEntries.forEach(data => {
@@ -343,9 +347,22 @@ const loadDownloadedFiles = async (e) => {
     }
 }
 
+const changeExpenseRowCount= (e)=>{
+    try {
+        e.preventDefault();
+        const rowCount= document.getElementById('numberOfExpenses').value;
+        localStorage.setItem('rowCount',rowCount);
+        getProducts(1);
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
 document.addEventListener("DOMContentLoaded", loadExpenseData);
 document.addEventListener("DOMContentLoaded", checkIfPremium);
 document.addEventListener("DOMContentLoaded", loadDownloadedFiles);
 submitExpenseBtn.addEventListener("click", addExpense);
 expenseList.addEventListener("click", deleteItems);
 buyPremiumBtn.addEventListener("click", buyPremiumMembership);
+showExpenses.addEventListener('click',changeExpenseRowCount);
