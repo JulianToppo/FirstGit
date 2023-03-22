@@ -3,8 +3,11 @@ const path = require('path');
 const Expense = require('../model/expense')
 
 exports.getExpensesPage = (req, res, next) => {
-
-    res.sendFile(path.join(__dirname, "..","view", "index.html"))
+    try {
+        res.sendFile(path.join(__dirname, "..", "view", "index.html"));
+    } catch (err) {
+        res.status(500).json({ Error: err });
+    }
 }
 
 exports.getEntries = async (req, res, next) => {
@@ -51,7 +54,7 @@ exports.deleteExpense = (req, res, next) => {
         console.log("inside delete expense function");
         const expenseId = req.params.expenseId;
         console.log(expenseId);
-        const data=Expense.destroy({
+        const data = Expense.destroy({
             where: {
                 id: expenseId
             }
@@ -68,21 +71,22 @@ exports.deleteExpense = (req, res, next) => {
 
 
 exports.editExpense = (req, res, next) => {
-    try{
-        
-        const id=req.params.editId;
-        const data= Expense.update(
-           {  
-             expenseAmount: req.body.expenseAmount,
-            description: req.body.description,
-            category: req.body.category },
-           { where: { id: id } },
-         );
-         res.status(200).json({EditedUser:data});
-     }catch(err){
+    try {
+
+        const id = req.params.editId;
+        const data = Expense.update(
+            {
+                expenseAmount: req.body.expenseAmount,
+                description: req.body.description,
+                category: req.body.category
+            },
+            { where: { id: id } },
+        );
+        res.status(200).json({ EditedUser: data });
+    } catch (err) {
         res.status(500)
-        .json({
-           error:err
-        })
-     }
+            .json({
+                error: err
+            })
+    }
 }
