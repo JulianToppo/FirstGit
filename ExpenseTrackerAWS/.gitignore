@@ -1,3 +1,6 @@
 
 # Secret  Files
 .env
+
+#NodeFiles
+/node_modules
