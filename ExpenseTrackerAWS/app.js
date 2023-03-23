@@ -1,12 +1,13 @@
 
 const express = require('express');
+const sequelize = require('./util/database')
 const loginSignUpRoutes = require('./routes/loginsignup');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchasePremium')
 const premiumRoutes = require('./routes/premium');
 const path = require('path');
 const bodyParser = require('body-parser')
-const sequelize = require('./util/database')
+
 const fs = require('fs');
 const helmet = require('helmet')
 
