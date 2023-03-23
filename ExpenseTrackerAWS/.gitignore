@@ -1,6 +1,7 @@
 
 # Secret  Files
-.env
+
+.env.example 
 
 #dependencies
 node_modules
