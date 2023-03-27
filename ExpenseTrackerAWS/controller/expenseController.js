@@ -130,9 +130,9 @@ exports.deleteExpense = async (req, res, next) => {
 
 function uploadToS3(data, filename) {
     console.log("inside upload to s3");
-    const BUCKET_NAME = 'expensetracker124';
-    const IAM_USER_KEY = 'AKIAXCOSF6OELYA3XRQI';
-    const IAM_USER_SECRET = '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';
+    const BUCKET_NAME = 'expensetracker1244';
+    const IAM_USER_KEY = 'AKIA4UZ3NUL2R5N4YXVV';
+    const IAM_USER_SECRET = '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';
 
     var s3bucket = new AWS.S3({
         accessKeyId: IAM_USER_KEY,

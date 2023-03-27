@@ -1,0 +1,6 @@
+::1 - - [27/Mar/2023:09:30:11 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+::1 - - [27/Mar/2023:09:30:11 +0000] "GET /main.css HTTP/1.1" 404 273 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+::1 - - [27/Mar/2023:09:30:15 +0000] "GET /signUp HTTP/1.1" 200 1004 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+::1 - - [27/Mar/2023:09:30:31 +0000] "POST /user/post HTTP/1.1" 201 269 "http://localhost:3000/signUp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+::1 - - [27/Mar/2023:09:30:31 +0000] "GET / HTTP/1.1" 304 - "http://localhost:3000/signUp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+::1 - - [27/Mar/2023:09:30:31 +0000] "GET /main.css HTTP/1.1" 404 273 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"

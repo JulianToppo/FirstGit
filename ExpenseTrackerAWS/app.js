@@ -1,6 +1,10 @@
 
 const express = require('express');
 const sequelize = require('./util/database')
+const dotenv = require('dotenv');
+dotenv.config();
+
+
 const loginSignUpRoutes = require('./routes/loginsignup');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchasePremium')
@@ -16,11 +20,11 @@ const expense = require('./model/expense');
 const order = require('./model/order');
 const forgotPasswordRequests = require('./model/forgotPasswordRequests')
 const filesDownloaded = require('./model/filesDownloaded');
-const dotenv = require('dotenv');
+
 const morgan= require('morgan');
 const app = express();
 // get config vars
-dotenv.config();
+
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
     {
@@ -48,10 +52,15 @@ app.use('/', loginSignUpRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/purchase', purchaseRoutes);
 app.use('/', premiumRoutes);
+
+app.use((req,res)=>{
+    const url= req.url;
+    res.sendFile(path.join(__dirname,"view",`${url}`))
+});
 //sql sync 
 sequelize.sync().then(result => {
     // console.log(result);
-    app.listen(process.env.PORT|| 3000);
+    app.listen('3000');
 }).catch(err => {
     console.log(err);
 })

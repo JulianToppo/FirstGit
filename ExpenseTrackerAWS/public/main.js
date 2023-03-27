@@ -2,6 +2,8 @@
 var submitBtn = document.getElementById("submitSignUpForm");
 var errorMsg = document.getElementById("errorMsg");
 
+var baseURL=process.env.HOST_IPADDRESS;
+
 var SubmitSignUpForm = async (e) => {
 
     try {
@@ -26,7 +28,7 @@ var SubmitSignUpForm = async (e) => {
             "password": password
         };
 
-        axios.post("http://localhost:3000/user/post", myObj)
+        axios.post(`${baseURL}`+"/user/post", myObj)
             .then(data => {
                 console.log(data.data.NewUser);
                 window.location.href="/";

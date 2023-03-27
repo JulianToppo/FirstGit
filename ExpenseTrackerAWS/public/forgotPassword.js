@@ -3,7 +3,7 @@ console.log("inside forgot password file")
 var getPassword = document.getElementById("getPasswordOnEmail");
 var errorMsg = document.getElementById("errorMsg");
 
-
+var baseURL=process.env.HOST_IPADDRESS;
 
 var sendMailRequest = (e) => {
     try {
@@ -22,7 +22,7 @@ var sendMailRequest = (e) => {
                 "emailId": emailId
             }
 
-             axios.post("http://localhost:3000/called/password/forgotpassword", myObj)
+             axios.post(`${baseURL}`+ "/called/password/forgotpassword", myObj)
                 .then(response => {
                     console.log(response.data.message);
                     window.location.href = "/";
