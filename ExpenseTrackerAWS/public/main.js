@@ -25,7 +25,7 @@ var SubmitSignUpForm = async (e) => {
             "password": password
         };
 
-        axios.post('http://localhost:3000'+"/user/post", myObj)
+        axios.post("/user/post", myObj)
             .then(data => {
                 console.log(data.data.NewUser);
                 window.location.href="/";

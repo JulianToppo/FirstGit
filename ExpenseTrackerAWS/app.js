@@ -24,6 +24,9 @@ const morgan= require('morgan');
 const app = express();
 // get config vars
 
+const Axios= require('axios');
+
+Axios.defaults.baseURL = process.env.HOST_IPADDRESS;
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
     {

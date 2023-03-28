@@ -4,6 +4,7 @@ var forgotPassword = document.getElementById("forgotPassword");
 var loginError = document.getElementById("loginError");
 var errorMsg = document.getElementById("errorMsg");
 
+
 // var OpenSignUp= async(e)=>{
 //     try{
 //         e.preventDefault();
@@ -36,7 +37,8 @@ var SubmitLoginForm = async (e) => {
             "password": password
         };
 
-        axios.post("http://localhost:3000"+ "/login/", myObj)
+        //console.log(HOST_IPADDRESS+ "/login/");
+        axios.post("/login/", myObj)
             .then(result => {
                 alert(JSON.stringify(result.data.Message));
               //  console.log(data.data);

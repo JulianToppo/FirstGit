@@ -19,7 +19,7 @@ var sendMailRequest = (e) => {
                 "emailId": emailId
             }
 
-             axios.post('http://localhost:3000'+ "/called/password/forgotpassword", myObj)
+             axios.post("/called/password/forgotpassword", myObj)
                 .then(response => {
                     console.log(response.data.message);
                     window.location.href = "/";
