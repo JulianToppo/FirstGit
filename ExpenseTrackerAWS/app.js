@@ -1,8 +1,7 @@
-
+const dotenv = require('dotenv').config();
 const express = require('express');
 const sequelize = require('./util/database')
-const dotenv = require('dotenv');
-dotenv.config();
+
 
 
 const loginSignUpRoutes = require('./routes/loginsignup');
@@ -33,7 +32,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 
 
 //app.use(helmet());
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json({ extended: false }));
 app.use(morgan('combined', {stream: accessLogStream}))
 user.hasMany(expense);
@@ -60,7 +59,7 @@ app.use((req,res)=>{
 //sql sync 
 sequelize.sync().then(result => {
     // console.log(result);
-    app.listen('3000');
+    app.listen(3000);
 }).catch(err => {
     console.log(err);
 })

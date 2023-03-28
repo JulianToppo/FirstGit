@@ -6,6 +6,7 @@ const sequelize = require("../util/database");
 const AWS = require('aws-sdk');
 const { resolve } = require("path");
 const fileDownloaded = require("../model/filesDownloaded");
+const dotnet=require('dotenv').config();
 
 exports.getExpensePage = (req, res, next) => {
     try {
@@ -130,9 +131,9 @@ exports.deleteExpense = async (req, res, next) => {
 
 function uploadToS3(data, filename) {
     console.log("inside upload to s3");
-    const BUCKET_NAME = 'expensetracker1244';
-    const IAM_USER_KEY = 'AKIA4UZ3NUL2R5N4YXVV';
-    const IAM_USER_SECRET = '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';
+    const BUCKET_NAME =process.env.BUCKET_NAME;
+    const IAM_USER_KEY = process.env.IAM_USER_KEY;
+    const IAM_USER_SECRET = process.env.IAM_USER_SECRET
 
     var s3bucket = new AWS.S3({
         accessKeyId: IAM_USER_KEY,

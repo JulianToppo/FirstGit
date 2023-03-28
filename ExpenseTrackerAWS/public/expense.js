@@ -5,11 +5,8 @@ var downloadedFilesList = document.getElementById('downloadedFiles');
 
 var showExpenses = document.getElementById('showExpenses');
 
-var baseURL=process.env.HOST_IPADDRESS;
-
 function showExpenseEntry(myObj) {
     try {
-
         
         let li = document.createElement("li");
         li.id = myObj.id;
@@ -105,7 +102,7 @@ const loadExpenseData = async (e) => {
         const rowCount=localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
         const pageNo = 1;
-        await axios.get(`${baseURL}` + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
+        await axios.get('http://localhost:3000' + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
                 console.log("result from load expense data recived")
                 expenseList.innerHTML='';
@@ -123,7 +120,7 @@ const getProducts= async (pageNo)=>{
     try {
         const rowCount=localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
-        await axios.get(`${baseURL}` + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
+        await axios.get('http://localhost:3000' + "/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
                 expenseList.innerHTML='';
                 result.data.ExpenseEntries.forEach(data => {
@@ -161,7 +158,7 @@ const addExpense = (e) => {
             };
 
             let token = localStorage.getItem("token");
-            axios.post(`${baseURL}` + "/expense/addExpense", myObj, { headers: { "Authorization": token } })
+            axios.post('http://localhost:3000' + "/expense/addExpense", myObj, { headers: { "Authorization": token } })
                 .then(data => {
                     //alert(JSON.stringify(data.data.Message));
                     //  console.log(data.data);
@@ -255,7 +252,7 @@ function checkIfPremium(e) {
     try {
         e.preventDefault();
         let token = localStorage.getItem("token");
-        axios.get(`${baseURL}` + "/purchase/checkPremium", { headers: { "Authorization": token } })
+        axios.get('http://localhost:3000' + "/purchase/checkPremium", { headers: { "Authorization": token } })
             .then(response => {
                 console.log(response.data);
                 if (response.data.success === true) {
@@ -275,7 +272,7 @@ function showLeaderboard() {
     inputElement.value = 'Show Leaderboard'
     inputElement.onclick = async () => {
         const token = localStorage.getItem('token')
-        const userLeaderBoardArray = await axios.get(`${baseURL}`+'/premium/showLeaderBoard', { headers: { "Authorization": token } })
+        const userLeaderBoardArray = await axios.get('http://localhost:3000'+'/premium/showLeaderBoard', { headers: { "Authorization": token } })
         console.log(userLeaderBoardArray.data)
 
         var leaderboardElem = document.getElementById('leaderboard')
@@ -309,7 +306,7 @@ function showLeaderboard() {
 
 async function download() {
     const token = localStorage.getItem('token')
-    axios.get(`${baseURL}` +"/expense/user/download", { headers: { "Authorization": token } })
+    axios.get('http://localhost:3000' +"/expense/user/download", { headers: { "Authorization": token } })
         .then((response) => {
             if (response.status === 200) {
 
@@ -337,7 +334,7 @@ const loadDownloadedFiles = async (e) => {
 
         e.preventDefault();
         let token = localStorage.getItem("token");
-        await axios.get(`${baseURL}` + "/expense/getDownloadedFiles", { headers: { "Authorization": token } })
+        await axios.get('http://localhost:3000' + "/expense/getDownloadedFiles", { headers: { "Authorization": token } })
             .then(result => {
                 result.data.DownloadedFiles.forEach(data => {
                     showDownloadedFiles(data);

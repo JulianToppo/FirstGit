@@ -16,8 +16,6 @@ var errorMsg = document.getElementById("errorMsg");
 //     }
 // }
 
-var baseURL=process.env.HOST_IPADDRESS;
-
 var SubmitLoginForm = async (e) => {
 
     try {
@@ -38,7 +36,7 @@ var SubmitLoginForm = async (e) => {
             "password": password
         };
 
-        axios.post(`${baseURL}`+ "/login/", myObj)
+        axios.post("http://localhost:3000"+ "/login/", myObj)
             .then(result => {
                 alert(JSON.stringify(result.data.Message));
               //  console.log(data.data);

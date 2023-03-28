@@ -1,8 +1,6 @@
 var resetPassword= document.getElementById('resetPassword');
 var errorMsg = document.getElementById("errorMsg");
 
-var baseURL=process.env.HOST_IPADDRESS;
-
 const updatePassword=async (e)=>{
     try {
         e.preventDefault();
@@ -21,7 +19,7 @@ const updatePassword=async (e)=>{
                 "password": password
             };
     
-            await axios.post(`${baseURL}`+"/password/updatePassword", myObj)
+            await axios.post('http://localhost:3000'+"/password/updatePassword", myObj)
             .then(response =>{
                 console.log(response.data.Message);
                 window.location="/"
