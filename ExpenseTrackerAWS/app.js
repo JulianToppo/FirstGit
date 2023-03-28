@@ -3,7 +3,7 @@ const express = require('express');
 const sequelize = require('./util/database')
 
 
-
+const cors= require('cors');
 const loginSignUpRoutes = require('./routes/loginsignup');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchasePremium')
@@ -35,6 +35,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json({ extended: false }));
 app.use(morgan('combined', {stream: accessLogStream}))
+app.use(cors());
 user.hasMany(expense);
 expense.belongsTo(user);
 
