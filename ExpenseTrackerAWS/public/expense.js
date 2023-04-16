@@ -7,7 +7,7 @@ var showExpenses = document.getElementById('showExpenses');
 
 function showExpenseEntry(myObj) {
     try {
-        
+
         let li = document.createElement("li");
         li.id = myObj.id;
 
@@ -41,7 +41,7 @@ function showDownloadedFiles(myObj) {
 
         var a = document.createElement("a");
         a.href = myObj.fileURL;
-        a.download = 'myexpense.csv';
+        a.download = 'myexpense.csv'; //filename while downloading
         a.innerText = myObj.fileURL;
 
         li.appendChild(a);
@@ -52,40 +52,39 @@ function showDownloadedFiles(myObj) {
     }
 }
 
-const showPagination = ({currpage,hasNext,next,hasPrevious,previous,last}) => {
+const showPagination = ({ currpage, hasNext, next, hasPrevious, previous, last }) => {
     try {
         console.log("inside show pagination");
 
-        const showPaginationList= document.getElementById("pagination");
-        showPaginationList.innerHTML='';
+        const showPaginationList = document.getElementById("pagination");
+        showPaginationList.innerHTML = '';
 
-        if(hasPrevious)
-        {
-        let btn= document.createElement('button');
-        btn.id=previous;
-        btn.addEventListener('click',()=>{
-            getProducts(previous)
-        });
-        btn.innerHTML=previous;
-        showPaginationList.appendChild(btn);
+        if (hasPrevious) {
+            let btn = document.createElement('button');
+            btn.id = previous;
+            btn.addEventListener('click', () => {
+                getProducts(previous)
+            });
+            btn.innerHTML = previous;
+            showPaginationList.appendChild(btn);
         }
 
-        let btn= document.createElement('button');
-        btn.id=currpage;
-        btn.innerHTML=currpage;
-        btn.addEventListener('click',()=>{
+        let btn = document.createElement('button');
+        btn.id = currpage;
+        btn.innerHTML = currpage;
+        btn.addEventListener('click', () => {
             getProducts(currpage)
         });
 
         showPaginationList.appendChild(btn);
 
-        if(hasNext){
-            let btn= document.createElement('button');
-            btn.id=next;
-            btn.addEventListener('click',()=>{
+        if (hasNext) {
+            let btn = document.createElement('button');
+            btn.id = next;
+            btn.addEventListener('click', () => {
                 getProducts(next)
             });
-            btn.innerHTML=next;
+            btn.innerHTML = next;
             showPaginationList.appendChild(btn);
         }
 
@@ -98,16 +97,16 @@ const showPagination = ({currpage,hasNext,next,hasPrevious,previous,last}) => {
 const loadExpenseData = async (e) => {
     try {
         e.preventDefault();
-        
-        const rowCount=localStorage.getItem('rowCount');
+
+        const rowCount = localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
         const pageNo = 1;
-        await axios.get("/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
+        await axios.get("/expense/getExpense/pageNo/" + `${pageNo}` + "/" + `${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
                 console.log("result from load expense data recived")
-                expenseList.innerHTML='';
+                expenseList.innerHTML = '';
                 result.data.ExpenseEntries.forEach(data => {
-                    showExpenseEntry(data);  
+                    showExpenseEntry(data);
                 });
                 showPagination(result.data.paginationValues);
             });
@@ -116,13 +115,13 @@ const loadExpenseData = async (e) => {
     }
 }
 
-const getProducts= async (pageNo)=>{
+const getProducts = async (pageNo) => {
     try {
-        const rowCount=localStorage.getItem('rowCount');
+        const rowCount = localStorage.getItem('rowCount');
         let token = localStorage.getItem("token");
-        await axios.get("/expense/getExpense/pageNo/"+ `${pageNo}`+"/"+`${rowCount}`, { headers: { "Authorization": token } })
+        await axios.get("/expense/getExpense/pageNo/" + `${pageNo}` + "/" + `${rowCount}`, { headers: { "Authorization": token } })
             .then(result => {
-                expenseList.innerHTML='';
+                expenseList.innerHTML = '';
                 result.data.ExpenseEntries.forEach(data => {
                     showExpenseEntry(data);
                 })
@@ -267,26 +266,31 @@ function checkIfPremium(e) {
 }
 
 function showLeaderboard() {
-    const inputElement = document.createElement("input");
-    inputElement.type = "button";
-    inputElement.value = 'Show Leaderboard'
-    inputElement.onclick = async () => {
-        const token = localStorage.getItem('token')
-        const userLeaderBoardArray = await axios.get('/premium/showLeaderBoard', { headers: { "Authorization": token } })
-        console.log(userLeaderBoardArray.data)
+    try {
+        const inputElement = document.createElement("input");
+        inputElement.type = "button";
+        inputElement.value = 'Show Leaderboard'
+        inputElement.onclick = async () => {
+            const token = localStorage.getItem('token')
+            const userLeaderBoardArray = await axios.get('/premium/showLeaderBoard', { headers: { "Authorization": token } })
+            console.log(userLeaderBoardArray.data)
 
-        var leaderboardElem = document.getElementById('leaderboard')
+            var leaderboardElem = document.getElementById('leaderboard')
 
-        while (leaderboardElem.firstChild) {
-            leaderboardElem.removeChild(leaderboardElem.firstChild);
+            while (leaderboardElem.firstChild) {
+                leaderboardElem.removeChild(leaderboardElem.firstChild);
+            }
+
+            leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
+            userLeaderBoardArray.data.forEach((userDetails) => {
+                leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpense || 0} </li>`
+            })
         }
-
-        leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
-        userLeaderBoardArray.data.forEach((userDetails) => {
-            leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpense || 0} </li>`
-        })
+        document.getElementById("message").appendChild(inputElement);
     }
-    document.getElementById("message").appendChild(inputElement);
+    catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -306,7 +310,7 @@ function showLeaderboard() {
 
 async function download() {
     const token = localStorage.getItem('token')
-    axios.get( "/expense/user/download", { headers: { "Authorization": token } })
+    axios.get("/expense/user/download", { headers: { "Authorization": token } })
         .then((response) => {
             if (response.status === 200) {
 
@@ -334,7 +338,7 @@ const loadDownloadedFiles = async (e) => {
 
         e.preventDefault();
         let token = localStorage.getItem("token");
-        await axios.get( "/expense/getDownloadedFiles", { headers: { "Authorization": token } })
+        await axios.get("/expense/getDownloadedFiles", { headers: { "Authorization": token } })
             .then(result => {
                 result.data.DownloadedFiles.forEach(data => {
                     showDownloadedFiles(data);
@@ -345,11 +349,11 @@ const loadDownloadedFiles = async (e) => {
     }
 }
 
-const changeExpenseRowCount= (e)=>{
+const changeExpenseRowCount = (e) => {
     try {
         e.preventDefault();
-        const rowCount= document.getElementById('numberOfExpenses').value;
-        localStorage.setItem('rowCount',rowCount);
+        const rowCount = document.getElementById('numberOfExpenses').value;
+        localStorage.setItem('rowCount', rowCount);
         getProducts(1);
     } catch (error) {
         console.log(error)
@@ -363,4 +367,4 @@ document.addEventListener("DOMContentLoaded", loadDownloadedFiles);
 submitExpenseBtn.addEventListener("click", addExpense);
 expenseList.addEventListener("click", deleteItems);
 buyPremiumBtn.addEventListener("click", buyPremiumMembership);
-showExpenses.addEventListener('click',changeExpenseRowCount);
+showExpenses.addEventListener('click', changeExpenseRowCount);
