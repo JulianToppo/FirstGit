@@ -65,9 +65,8 @@ exports.getExpense = async (req, res, next) => {
         const rowCount=req.params.rowCount;
         const totalCount= await Expense.count();
         console.log(totalCount);
-
-       
-        const lastPage= Math.floor(totalCount/rowCount)+1;
+               
+        const lastPage=totalCount%rowCount?Math.floor(totalCount/rowCount)+1:Math.floor(totalCount/rowCount);
         console.log(lastPage)
         const data = await Expense.findAll({ 
             where: { registeredUserId: req.user.id },
@@ -135,18 +134,18 @@ function uploadToS3(data, filename) {
     const IAM_USER_KEY = process.env.IAM_USER_KEY;
     const IAM_USER_SECRET = process.env.IAM_USER_SECRET
 
+    console.log(BUCKET_NAME);
     var s3bucket = new AWS.S3({
         accessKeyId: IAM_USER_KEY,
         secretAccessKey: IAM_USER_SECRET,
         //     Bucket: BUCKET_NAME
     })
 
-
     var params = {
         Bucket: BUCKET_NAME,
         Key: filename,
         Body: data,
-        ACL: 'public-read'
+        ACL: 'public-read' //access control list
     }
 
     return new Promise((resolve, reject) => {
