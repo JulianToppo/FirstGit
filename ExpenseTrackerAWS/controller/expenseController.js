@@ -63,11 +63,15 @@ exports.getExpense = async (req, res, next) => {
         console.log("get expense entries ");
         const pageNo= req.params.pageNo;
         const rowCount=req.params.rowCount;
-        const totalCount= await Expense.count();
-        console.log(totalCount);
+        const totalCount= await Expense.count({
+            where:{
+                registeredUserId: req.user.id
+            }
+        });
+       // console.log(totalCount);
                
-        const lastPage=totalCount%rowCount?Math.floor(totalCount/rowCount)+1:Math.floor(totalCount/rowCount);
-        console.log(lastPage)
+        const lastPage=(totalCount%rowCount)==0?Math.floor(totalCount/rowCount):Math.floor(totalCount/rowCount)+1;
+        console.log("lastpage",lastPage)
         const data = await Expense.findAll({ 
             where: { registeredUserId: req.user.id },
             limit:Number(rowCount),
