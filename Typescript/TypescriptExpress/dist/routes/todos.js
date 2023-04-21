@@ -9,20 +9,23 @@ router.get('/', (req, res, next) => {
     });
 });
 router.post('/todo', (req, res, next) => {
+    const body = req.body;
     const newTodo = {
-        id: req.body.id,
-        text: req.body.text
+        id: new Date().toISOString(),
+        text: body.text
     };
     todos.push(newTodo);
     res.status(201).json({ Todos: todos });
 });
 router.put('/todo/:todoID', (req, res, next) => {
-    const tid = req.params.todoID;
+    const params = req.params;
+    const body = req.body;
+    const tid = params.todoID;
     const todoIndex = todos.findIndex((todoItem) => todoItem.id == tid);
     if (todoIndex >= 0) {
         todos[todoIndex] = {
             id: todos[todoIndex].id,
-            text: req.body.text
+            text: body.text
         };
         res.status(200).json({ message: 'Updated todo', Todos: todos });
     }
@@ -30,11 +33,12 @@ router.put('/todo/:todoID', (req, res, next) => {
         res.status(404).json({ message: 'Could not find todo for this id' });
     }
 });
-router.delete('/todo/:todoId', (req, res, next) => {
+router.delete('/todo/:todoID', (req, res, next) => {
+    const params = req.params;
     let size = todos.length;
-    console.log(req.params.todoId);
+    console.log(params.todoID);
     todos = todos.filter(todoItems => {
-        if (todoItems.id != req.params.todoId) {
+        if (todoItems.id != params.todoID) {
             return todoItems;
         }
     });
