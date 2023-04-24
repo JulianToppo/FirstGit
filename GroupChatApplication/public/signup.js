@@ -20,7 +20,8 @@ var submitSignUpDetail=(e)=>{
 
             axios.post('http://localhost:3000/signup',myObj).then(
             (result)=>{
-                console.log(result.data.message)
+                console.log(result.data.message);
+                alert("Successfully signed up!")
             }
             ).catch(err=>{  
                 console.log(err)
