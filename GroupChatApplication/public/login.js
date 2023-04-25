@@ -16,7 +16,9 @@ var submitLoginForm=(e)=>{
             }
     
             axios.post("http://localhost:3000/login",myObj).then((result)=>{
+                localStorage.setItem("token",result.data.token);
                 alert(result.data.message);
+
             }).catch(err=>{
                 alert(JSON.stringify(err.response.data.Error));
                 console.log(err.response.data.Error)

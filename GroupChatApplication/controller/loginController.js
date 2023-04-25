@@ -1,33 +1,40 @@
-const path= require('path')
-const user= require('../model/user')
-const bcrypt=require('bcrypt')
+const path = require('path')
+const user = require('../model/user')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-var getLoginPage= async(req,res,next)=>{
+var generateToken = (id) => {
+    return jwt.sign({ id: id }, "secretkey");
+}
+
+var getLoginPage = async (req, res, next) => {
     try {
-        res.sendFile(path.join(__dirname,"..","views","login.html"));
+        res.sendFile(path.join(__dirname, "..", "views", "login.html"));
     } catch (error) {
-        res.status(500).json({Error: error});
+        res.status(500).json({ Error: error });
     }
 }
 
-var submitLoginForm= async(req,res,next)=>{
+var submitLoginForm = async (req, res, next) => {
     try {
-        const {email,password}=req.body;
-        var userFound= await user.findOne({
-            where:{
-                email:email
+        const { email, password } = req.body;
+        var userFound = await user.findOne({
+            where: {
+                email: email
             }
         })
-        if(!userFound){
+        if (!userFound) {
             res.status(404).json({ Error: "User not found", success: "false" });
-        }else{
-            console.log(userFound.password)
-            if(await bcrypt.compare(password,userFound.password)){
-                res.status(200).json({message:"User login successful",status:true})
-            }else{
+        } else {
+            // console.log(userFound.password,userFound.id)
+            // console.log(generateToken(userFound.id));
+            if (await bcrypt.compare(password, userFound.password)) {
+                res.status(200).json({ message: "User login successful", status: true, token: generateToken(userFound.id) })
+
+            } else {
                 res.status(401).json({ Error: "User not authorized", success: "false" });
             }
-            
+
         }
 
     } catch (error) {
@@ -35,7 +42,7 @@ var submitLoginForm= async(req,res,next)=>{
     }
 }
 
-module.exports={
+module.exports = {
     getLoginPage,
     submitLoginForm
 }
