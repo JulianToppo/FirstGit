@@ -1,10 +1,10 @@
 const path = require('path')
-const user = require('../model/user')
+const users = require('../model/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 var generateToken = (id) => {
-    return jwt.sign({ id: id }, "secretkey");
+    return jwt.sign({ userId: id }, "secretkey");
 }
 
 var getLoginPage = async (req, res, next) => {
@@ -18,7 +18,7 @@ var getLoginPage = async (req, res, next) => {
 var submitLoginForm = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        var userFound = await user.findOne({
+        var userFound = await users.findOne({
             where: {
                 email: email
             }

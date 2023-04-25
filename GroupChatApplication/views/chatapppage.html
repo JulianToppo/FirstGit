@@ -14,7 +14,7 @@
 <body>
     <h1 style="text-align: center;">Chat App</h1>
     <div class="container justify-content-center mb-4 mt-4">
-        <ul class="list-group">
+        <ul class="list-group" id="messageQueue">
             <!-- <li class="list-group-item list-group-item-dark">A simple default list group item</li> -->
            
         </ul>
@@ -22,12 +22,15 @@
     <div class="fixed-bottom rounded" style="background-color: rgb(34, 33, 112);">
         <div class="d-flex justify-content-center mb-4 mt-4">
             <div class="form-outline me-2" style="width: 24rem">
-                <input type="text" id="message" class="form-control" />
+                <input type="text" id="message" class="form-control" required/>
             </div>
             <button type="button" class="btn btn-primary" id="sendMessage">Button</button>
         </div>
     </div>
-    <script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="./chatapp.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
 </body>
 
 </html>

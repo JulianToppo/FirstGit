@@ -22,6 +22,7 @@ var submitSignUpDetail=(e)=>{
             (result)=>{
                 console.log(result.data.message);
                 alert("Successfully signed up!")
+                window.location="/"
             }
             ).catch(err=>{  
                 console.log(err)
