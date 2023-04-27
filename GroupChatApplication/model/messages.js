@@ -12,7 +12,6 @@ const Messages= sequelize.define('messages',{
     message:{
         type: Sequelize.STRING,
         allowNull: false,
-        unique:true 
     }
 })
 

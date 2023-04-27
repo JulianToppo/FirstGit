@@ -27,7 +27,7 @@ app.use(chatAppRouter);
 user.hasMany(messages);
 messages.belongsTo(user);
 
-sequelize.sync().then(result => {
+sequelize.sync({}).then(result => {
     app.listen(port);
 }).catch(err => {
     console.log(err);

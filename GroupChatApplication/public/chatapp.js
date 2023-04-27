@@ -25,11 +25,12 @@ var displayMessages= (e)=>{
     }
 }
 
-var addToMessagesList=(messageArray)=>{
+//Additiong of message in the list
+var addToMessagesList= async (messageArray)=>{
     try {
         let count=0;
         messageQueue.innerHTML="";
-        messageArray.forEach(element => {
+        messageArray.forEach(async element => {
             let elem= document.createElement('li');
             console.log(count);
             elem.id=count;
@@ -38,7 +39,11 @@ var addToMessagesList=(messageArray)=>{
             }else{
                 elem.classList="list-group-item list-group-item-light"
             }
+
+            // let token=localStorage.getItem('token')
+            // let username= await axios.get("http://localhost:3000/chatapp/getusername"+"/"+element.userId,{headers:{"Authorization":token}})
            
+            //elem.innerHTML=username.data.username+":"+ element.message;
             elem.innerHTML=element.message;
             count++;
 
