@@ -23,7 +23,23 @@ var sendMessages= async(req,res,next)=>{
     }
 }
 
+var loadMessages= async(req,res,next)=>{
+
+    try {
+        let userMessages=await messagesTB.findAll({
+            // where:{
+            //     userId:req.user.id
+            // }
+        })
+
+        res.status(200).json({message:"User Messages retrieved",messages:userMessages,status:true})
+    } catch (error) {
+        res.status(500).json({message:error, status:false})
+    }
+}
+
 module.exports = {
     getChatAppPage,
-    sendMessages
+    sendMessages,
+    loadMessages
 }

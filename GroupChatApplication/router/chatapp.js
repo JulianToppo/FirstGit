@@ -5,6 +5,6 @@ const router=express.Router();
 
 router.get('/chatapp',chatAppController.getChatAppPage);
 router.post('/chatapp/sendmessage',authorization.authorizationUser,chatAppController.sendMessages);
-
+router.get('/chatapp/loadmessages',authorization.authorizationUser,chatAppController.loadMessages);
 
 module.exports=router;
