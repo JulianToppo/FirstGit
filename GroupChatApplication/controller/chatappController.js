@@ -1,6 +1,7 @@
 const path = require('path')
 const messagesTB = require('../model/messages')
 const user= require('../model/user')
+const { Op } = require("sequelize");
 
 var getChatAppPage = async (req, res, next) => {
     try {
@@ -24,15 +25,20 @@ var sendMessages = async (req, res, next) => {
     }
 }
 
-var loadMessages = async (req, res, next) => {
+var getMessages = async (req, res, next) => {
 
     try {
+        const{lastId}=req.params;
+        console.log(lastId);
         let userMessages = await messagesTB.findAll({
-            // where:{
-            //     userId:req.user.id
-            // }
+            where:{
+                id:{
+                     [Op.gt]: lastId
+                }
+               
+            }
         })
-
+        console.log(userMessages.length)
         res.status(200).json({ message: "User Messages retrieved", messages: userMessages, status: true })
     } catch (error) {
         res.status(500).json({ message: error, status: false })
@@ -64,6 +70,6 @@ var getUsername = async (req, res, next) => {
 module.exports = {
     getChatAppPage,
     sendMessages,
-    loadMessages,
+    getMessages,
     getUsername
 }
