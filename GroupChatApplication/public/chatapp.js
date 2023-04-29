@@ -48,11 +48,11 @@ function sendMessages(e) {
 var printMessages = async (listCheckForValues, oldmessageArray) => {
 
     try {
-        let count = 0;
 
-        await listCheckForValues.forEach(async element => {
+        console.log(listCheckForValues)
+        for (let i = 0; i < listCheckForValues.length; i++) {
             let token = localStorage.getItem('token')
-            let username = await axios.get("http://localhost:3000/chatapp/getusername" + "/" + element.userId, { headers: { "Authorization": token } })
+            let username = await axios.get("http://localhost:3000/chatapp/getusername" + "/" + listCheckForValues[i].userId, { headers: { "Authorization": token } })
             //     result => {
             //         elem.innerHTML = result.data.username + " : " + element.message;
             //         count++;
@@ -62,17 +62,18 @@ var printMessages = async (listCheckForValues, oldmessageArray) => {
             // ).catch(err => {
             //     console.log(err)
             // })
-
+            console.log(listCheckForValues[i])
+            console.log(username.data.username);
             let elem = document.createElement('li');
-            console.log(count);
-            elem.id = count;
-            if (count % 2) {
+            
+            elem.id = i;
+            if (i % 2) {
                 elem.classList = "list-group-item list-group-item-dark"
             } else {
                 elem.classList = "list-group-item list-group-item-light"
             }
-            elem.innerHTML = username.data.username + " : " + element.message;
-            count++;
+            elem.innerHTML = username.data.username + " : " + listCheckForValues[i].message;
+            
             messageQueue.appendChild(elem);
 
 
@@ -83,10 +84,7 @@ var printMessages = async (listCheckForValues, oldmessageArray) => {
             if (messageQueue.getElementsByTagName('li').length > 10) {
                 messageQueue.removeChild(messageQueue.firstElementChild);
             }
-
-            console.log(element)
-        });
-
+        }
         localStorage.setItem("oldmessages", JSON.stringify(oldmessageArray))
     }
     catch (err) {
