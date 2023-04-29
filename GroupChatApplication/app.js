@@ -7,6 +7,9 @@ const chatAppRouter = require('./router/chatapp')
 //tables
 const user=require('./model/user')
 const messages=require('./model/messages')
+const groups=require('./model/groups')
+const usergroups=require('./model/user-groups')
+const inviteRequests=require('./model/inviteRequest')
 const app=express();
 const path= require('path')
 const port=3000;
@@ -26,6 +29,18 @@ app.use(chatAppRouter);
 //Sql table relations
 user.hasMany(messages);
 messages.belongsTo(user);
+
+groups.hasMany(messages);
+messages.belongsTo(groups);
+
+user.belongsToMany(groups,{through:usergroups});
+groups.belongsToMany(user,{through:usergroups});
+
+user.hasMany(inviteRequests);
+inviteRequests.belongsTo(user)
+
+groups.hasMany(inviteRequests);
+inviteRequests.belongsTo(groups)
 
 sequelize.sync({}).then(result => {
     app.listen(port);

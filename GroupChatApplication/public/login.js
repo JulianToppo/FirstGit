@@ -16,6 +16,7 @@ var submitLoginForm=(e)=>{
             }
     
             axios.post("http://localhost:3000/login",myObj).then((result)=>{
+                localStorage.clear();
                 localStorage.setItem("token",result.data.token);
                 alert(result.data.message);
                 window.location="/chatapp"
