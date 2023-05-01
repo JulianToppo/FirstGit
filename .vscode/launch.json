@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         
+        
         {
             "name": "Attach to Chrome",
             "port": 9222,
@@ -21,7 +22,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\ExpenseTrackerAWS\\app.js",
+            "program": "${workspaceFolder}\\GroupChatApplication\\app.js",
             "restart": true,
             "runtimeExecutable": "nodemon",
             "console": "integratedTerminal"

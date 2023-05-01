@@ -3,7 +3,7 @@ const Expense = require('../model/expense');
 const sequelize = require('../util/database');
 
 const getUserLeaderBoard = async (req, res) => {
-    try{
+    try {
         // const leaderboardofusers = await User.findAll({
         //     attributes: ['id', 'name',[sequelize.fn('sum', sequelize.col('expenses.expenseAmount')), 'total_cost'] ],
         //     include: [
@@ -17,18 +17,18 @@ const getUserLeaderBoard = async (req, res) => {
 
         // })
         const leaderboardofusers = await User.findAll({
-            attributes: ['id', 'name','totalExpense'],
-            order:[['totalExpense', 'DESC']]
+            attributes: ['id', 'name', 'totalExpense'],
+            order: [['totalExpense', 'DESC']]
         })
 
-        
-       
+
+
         res.status(200).json(leaderboardofusers)
-    
-} catch (err){
-    console.log(err)
-    res.status(500).json(err)
-}
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json(err)
+    }
 }
 
 module.exports = {
