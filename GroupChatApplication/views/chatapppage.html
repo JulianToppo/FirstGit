@@ -16,8 +16,11 @@
     <h1 style="text-align: center;">Chat App</h1>
     <div class="d-flex justify-content-start">
         <div class="align-self-stretch w-25 p-3 button-group-vertical">
+            <h3>Active User:</h3>
+            <h3  style="color: rgb(0, 255, 38);" id="activeUser"></h3>
+
             <h3>Active Group:</h3>
-            <h3 id="activeGroup"></h3>
+            <h3  style="color: rgb(0, 255, 38);" id="activeGroup"></h3>
             <br>
             <ul class="list-group" id="groups">
                 <!-- <button class="btn btn-outline-warning" type="button">Default Group</button> -->
@@ -36,8 +39,23 @@
             <br>
 
             <div id="inviteform" style="display:none;">
-                <input list="users" id="userInviteList" required>
+                <label for="userInviteList">Username:</label>
+                <input class="form-control" list="users" id="userInviteList" required>
                 <datalist id="users">
+                    <!-- <option id="" value="">Greek</option> -->
+
+                </datalist>
+                <br>
+                <label for="phonenumer">Phonenumber:</label>
+                <input class="form-control" list="phonenumerList" id="phonenumer" required>
+                <datalist id="phonenumerList">
+                    <!-- <option id="" value="">Greek</option> -->
+
+                </datalist>
+                <br>
+                <label for="email">Email:</label>
+                <input class="form-control" list="emailList" id="email" required>
+                <datalist id="emailList">
                     <!-- <option id="" value="">Greek</option> -->
 
                 </datalist>
@@ -47,6 +65,11 @@
             <br>
             <button id="pendingRequestsBtn" class="btn btn-block" style="background-color: rgb(34, 33, 112);color: white;width: 70%;">Pending Requests</button>
             <ul class="list-group list-group-numbered" id="pendingRequestsList">
+                <!-- <li class="list-group-item">Join gp1 request by team1<button id="acceptRequest" class="btn-primary float-right">Accept</button></li> -->
+            </ul>
+            <br>
+            <button id="membersBtn" class="btn btn-block" style="background-color: rgb(34, 33, 112);color: white;width: 70%;">Members</button>
+            <ul class="list-group list-group-numbered" id="memberList" style="display: none;">
                 <!-- <li class="list-group-item">Join gp1 request by team1<button id="acceptRequest" class="btn-primary float-right">Accept</button></li> -->
             </ul>
 

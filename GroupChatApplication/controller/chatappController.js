@@ -5,6 +5,7 @@ const groupTB = require('../model/groups')
 const { Op } = require("sequelize");
 const UserGroupsTB = require('../model/user-groups');
 const inviteRequests = require('../model/inviteRequest')
+const admin = require('../model/admin')
 
 
 var getChatAppPage = async (req, res, next) => {
@@ -73,6 +74,20 @@ var getUsername = async (req, res, next) => {
     }
 }
 
+var getActiveUsers= async (req, res, next) => {
+    try {
+        await UserTB.findOne({
+            where:{
+                id:req.user.id
+            }
+        }).then(result=>{
+            res.status(200).json({username:result.username,status:true})
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 var getGroups = async (req, res, next) => {
     try {
         // console.log("userIDdddddddd", req.user.id)
@@ -108,7 +123,18 @@ var addGroup = async (req, res, next) => {
             name: groupName,
         }).then(async result => {
             //Linking the tables user and groups
-            await req.user.addGroup(result);
+            let addUserGroup = await req.user.addGroup(result);
+            let adminEntry = await admin.create({
+                status: true,
+                userId: req.user.id,
+                groupId: result.id
+            })
+            if (addUserGroup.length < 1) {
+                res.status(500).json({ Error: addUserGroup, status: false })
+            }
+            if (adminEntry.length < 1) {
+                res.status(500).json({ Error: adminEntry, status: false })
+            }
             res.status(201).json({ data: result, status: true })
         }).catch(err => {
             res.status(500).json({ Error: err, status: false })
@@ -133,13 +159,16 @@ var getUsers = async (req, res, next) => {
 //making entries in the request table
 var userEntryForRequest = async (req, res, next) => {
     try {
-        const { userInvited, groupID } = req.body;
+        const { userInvited,PhoneNumber,Email, groupID } = req.body;
+
         UserTB.findOne({
             where: {
-                username: userInvited
+                username: userInvited,
+                phonenumber:PhoneNumber,
+                email:Email
             }
         }).then(result => {
-            console.log("usernameidcheck",result.id ,req.user.id);
+            console.log("usernameidcheck", result.id, req.user.id);
             if (result.id == req.user.id) {
                 throw new Error("User can't sent invite to himself!")
             } else {
@@ -205,6 +234,78 @@ var updateGroups = async (req, res, next) => {
         res.status(500).json({ Error: error, status: false })
     }
 }
+
+var getUsersInGroup = async (req, res, next) => {
+    try {
+        const { groupID } = req.params;
+        await UserGroupsTB.findAll({
+            where: {
+                groupId: groupID
+            }
+        }).then(result => {
+            res.status(201).json({ data: result, status: true })
+        })
+
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+}
+
+var makeUserAdmin = async (req, res, next) => {
+    try {
+        const { userid, groupID } = req.body;
+        await admin.create({
+            status: true,
+            userId: userid,
+            groupId: groupID
+        }).then(result => {
+            res.status(201).json({ data: result, status: true })
+        })
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+}
+
+var deleteUserFromGroup=  async (req, res, next) => {
+    try {
+        const { userid, groupID } = req.body;
+        UserGroupsTB.destroy({
+            where:{
+                userId:userid,
+                groupId:groupID
+            }
+        }).then(result=>{
+            res.status(200).json({ message:"User deleted from group",data: result, status: true })
+        })
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+
+}
+
+var isadmin=  async (req, res, next) => {
+    try {
+        let {userID,groupID}= req.params;
+        console.log(userID)
+        if(userID=="token"){
+            console.log("check")
+            userID=req.user.id;
+        }
+        console.log("dekho",userID,groupID);
+        admin.findOne({
+            where:{
+                userId:userID,
+                groupId:groupID,
+                status:true
+            }
+        }).then(result=>{
+           
+            res.status(200).json({ data: result, status: true })
+        })
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+}
 module.exports = {
     getChatAppPage,
     sendMessages,
@@ -215,5 +316,10 @@ module.exports = {
     getUsers,
     userEntryForRequest,
     getRequestList,
-    updateGroups
+    updateGroups,
+    getUsersInGroup,
+    makeUserAdmin,
+    deleteUserFromGroup,
+    isadmin,
+    getActiveUsers
 }

@@ -10,6 +10,7 @@ const messages=require('./model/messages')
 const groups=require('./model/groups')
 const usergroups=require('./model/user-groups')
 const inviteRequests=require('./model/inviteRequest')
+const admin=require('./model/admin')
 const app=express();
 const path= require('path')
 const port=3000;
@@ -41,6 +42,12 @@ inviteRequests.belongsTo(user)
 
 groups.hasMany(inviteRequests);
 inviteRequests.belongsTo(groups)
+
+groups.hasMany(admin)
+admin.belongsTo(groups);
+
+user.hasMany(admin)
+admin.belongsTo(user);
 
 sequelize.sync({}).then(result => {
     app.listen(port);
