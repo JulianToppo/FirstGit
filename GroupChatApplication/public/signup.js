@@ -18,7 +18,7 @@ var submitSignUpDetail=(e)=>{
                 'password':password
             }
 
-            axios.post('http://localhost:3000/signup',myObj).then(
+            axios.post('/signup',myObj).then(
             (result)=>{
                 console.log(result.data.message);
                 alert("Successfully signed up!")
