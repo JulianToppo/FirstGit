@@ -1,6 +1,6 @@
 const path= require('path')
 const user= require('../model/user')
-const bcrypt=require('bcrypt')
+const bcrypt=require('bcryptjs')
 
 var getSignUpPage =  async (req,res,next)=>{
     try {

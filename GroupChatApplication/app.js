@@ -16,10 +16,10 @@ const morgan=require('morgan')
 const path = require('path')
 const port = 3000;
 const cors = require('cors')
-const axios = require('axios')
-
+const fs = require('fs');
 const Axios = require('axios');
-Axios.defaults.baseURL = process.env.HOST_IPADDRESS;
+
+Axios.default.baseURL = process.env.HOST_IPADDRESS;
 
 app.use(cors({
     origin: '*',
