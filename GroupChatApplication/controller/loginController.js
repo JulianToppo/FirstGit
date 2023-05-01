@@ -1,6 +1,6 @@
 const path = require('path')
 const users = require('../model/user')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 var generateToken = (id) => {
