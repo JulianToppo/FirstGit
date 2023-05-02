@@ -1,3 +1,12 @@
+import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+
+const socket = io("http://localhost:3000");
+
+socket.on('broadcast',()=>{
+    console.log("broadcast")
+    loadMessages();
+})
+
 const sendMessage = document.getElementById('sendMessage')
 const messageQueue = document.getElementById('messageQueue')
 const groups = document.getElementById('groups')
@@ -6,13 +15,15 @@ const groupFormBtn = document.getElementById('submitGroupName')
 const grpAlert = document.getElementById('groupAlert')
 const inviteBtn = document.getElementById('inviteUsersBtn')
 const users = document.getElementById('users');
-const phonenumerList=document.getElementById('phonenumerList');
-const emailList=document.getElementById('emailList');
+const phonenumerList = document.getElementById('phonenumerList');
+const emailList = document.getElementById('emailList');
 const submitUserInviteName = document.getElementById('submitUserInviteName');
 const pendingRequestsBtn = document.getElementById('pendingRequestsBtn')
 const pendingRequestsList = document.getElementById('pendingRequestsList');
 const memberList = document.getElementById('memberList');
 const membersBtn = document.getElementById('membersBtn')
+
+
 
 function sendMessages(e) {
     try {
@@ -124,6 +135,7 @@ var addToMessagesList = async () => {
 var loadMessages = async () => {
     try {
         // e.preventDefault();
+        console.log("loadMessages called")
         let lastId;
 
         let grpId = localStorage.getItem('groupId') == null ? 0 : localStorage.getItem('groupId');
@@ -187,15 +199,15 @@ var refreshloadMessages = () => {
 //     }
 // }
 
-var showusername=async ()=>{
+var showusername = async () => {
     try {
-        let token=localStorage.getItem('token');
-        await axios.get("/chatapp/"+"getusername",{headers:{"Authorization":token}}).then(result=>{
-            document.getElementById('activeUser').innerHTML=result.data.username;
-        }).catch(err=>{
+        let token = localStorage.getItem('token');
+        await axios.get("/chatapp/" + "getusername", { headers: { "Authorization": token } }).then(result => {
+            document.getElementById('activeUser').innerHTML = result.data.username;
+        }).catch(err => {
             console.log(err);
         })
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -291,7 +303,7 @@ var addGroup = (e) => {
 
 var addUsersForInvite = (usersList) => {
     try {
-        for(let i=0;i<usersList.length;i++){
+        for (let i = 0; i < usersList.length; i++) {
             let newElemUsername = document.createElement('option');
             // newElem.id=element.id;
             newElemUsername.innerHTML = usersList[i].username;
@@ -340,8 +352,8 @@ var sendInvite = async (e) => {
         let userInvited = document.getElementById('userInviteList').value;
         let phonenumer = document.getElementById('phonenumer').value;
         let email = document.getElementById('email').value;
-        
-        if (userInvited == '' || phonenumer == ''  || email == '' ) {
+
+        if (userInvited == '' || phonenumer == '' || email == '') {
             return;
         }
 
@@ -354,8 +366,8 @@ var sendInvite = async (e) => {
         let myObj = {
             "userInvited": userInvited,
             "groupID": grpId,
-            "PhoneNumber":phonenumer,
-            "Email":email
+            "PhoneNumber": phonenumer,
+            "Email": email
         }
         let token = localStorage.getItem('token')
         await axios.post("/chatapp/" + "sendinvite", myObj, { headers: { "Authorization": token } }).then(
@@ -453,7 +465,7 @@ var getGroupsJoinRequests = async () => {
 
 var addUsersToMembersList = async (listOfMembers) => {
     try {
-        memberList.innerHTML="";
+        memberList.innerHTML = "";
         for (let i = 0; i < listOfMembers.length; i++) {
 
             console.log(listOfMembers[i]);
@@ -465,8 +477,8 @@ var addUsersToMembersList = async (listOfMembers) => {
 
 
             //isadmin
-            let isadmin =await  axios.get("/chatapp/" + "isadmin/" + `${listOfMembers[i].userId}/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
-            
+            let isadmin = await axios.get("/chatapp/" + "isadmin/" + `${listOfMembers[i].userId}/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
+
             if (isadmin.data.data) {
                 let adminBtn = document.createElement('button');
                 adminBtn.classList = "btn btn-success float-end"
@@ -490,36 +502,36 @@ var addUsersToMembersList = async (listOfMembers) => {
                         "userid": listOfMembers[i].userId,
                         "groupID": listOfMembers[i].groupId
                     }
-                 
+
                     await axios.post("/chatapp/makeadmin", myObj, { headers: { "Authorization": token } }).then(
                         result => {
                             alert("Admin Access Granted");
-                           // acceptBtn.style.display = "none";
+                            // acceptBtn.style.display = "none";
                             acceptBtn.classList = "btn btn-success"
                             acceptBtn.innerHTML = "Admin"
-                            
+
                         }
                     )
                 }
 
                 deleteBtn.onclick = async () => {
 
-                    let isadmin =await  axios.get("/chatapp/" + "isadmin/" + "token"+`/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
-                    if(isadmin.data.status){
+                    let isadmin = await axios.get("/chatapp/" + "isadmin/" + "token" + `/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
+                    if (isadmin.data.status) {
                         let myObj = {
-                        "userid": listOfMembers[i].userId,
-                        "groupID": listOfMembers[i].groupId
+                            "userid": listOfMembers[i].userId,
+                            "groupID": listOfMembers[i].groupId
+                        }
+                        await axios.post("/chatapp/" + "deleteUserFromGroup", myObj, { headers: { "Authorization": token } }).then(
+                            result => {
+                                alert(JSON.stringify(result.data.message))
+                                newElem.style.display = "none";
+                                localStorage.removeItem("groupId")
+                            })
                     }
-                    await axios.post("/chatapp/" + "deleteUserFromGroup", myObj, { headers: { "Authorization": token } }).then(
-                        result => {
-                            alert(JSON.stringify(result.data.message))
-                            newElem.style.display = "none";
-                            localStorage.removeItem("groupId")
-                        })
-                    }
-                    
+
                 }
-               
+
                 newElem.appendChild(deleteBtn);
                 newElem.appendChild(acceptBtn);
             }
@@ -561,7 +573,7 @@ var showGroupsMemberList = async () => {
 document.addEventListener("DOMContentLoaded", loadMessages);
 document.addEventListener("DOMContentLoaded", getGroupsForUser)
 document.addEventListener('DOMContentLoaded', getGroupsJoinRequests);
-document.addEventListener('DOMContentLoaded',showusername)
+document.addEventListener('DOMContentLoaded', showusername)
 sendMessage.addEventListener('click', sendMessages);
 groupBtn.addEventListener('click', displayGroupForm);
 groupFormBtn.addEventListener('click', addGroup);

@@ -7,7 +7,6 @@ const UserGroupsTB = require('../model/user-groups');
 const inviteRequests = require('../model/inviteRequest')
 const admin = require('../model/admin')
 
-
 var getChatAppPage = async (req, res, next) => {
     try {
         res.sendFile(path.join(__dirname, "..", "views", "chatapppage.html"))
@@ -16,16 +15,21 @@ var getChatAppPage = async (req, res, next) => {
     }
 }
 
-var sendMessages = async (req, res, next) => {
+var sendMessages = async (req,res,next,) => {
     try {
+      
         const { message, groupID } = req.body;
-        await messagesTB.create({
+        let createSuccessful=await messagesTB.create({
             message: message,
             userId: req.user.id,
             groupId: groupID
         })
-
+        if(createSuccessful){
+         console.log("socket called")
+           res.io.broadcast.emit('broadcast',{});
+        }
         res.status(201).json({ message: "Message entry made into the database", status: true })
+        
     } catch (error) {
         res.status(500).json({ message: error, status: false })
     }
