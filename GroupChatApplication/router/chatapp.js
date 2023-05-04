@@ -18,5 +18,6 @@ router.get('/chatapp/getGroupMembers/:groupID',authorization.authorizationUser,c
 router.post('/chatapp/makeadmin',authorization.authorizationUser,chatAppController.makeUserAdmin);
 router.post('/chatapp/deleteUserFromGroup',authorization.authorizationUser,chatAppController.deleteUserFromGroup);
 router.get('/chatapp/isadmin/:userID/:groupID',authorization.authorizationUser,chatAppController.isadmin);
+router.get('/chatapp/getid',authorization.authorizationUser,chatAppController.getId);
 
 module.exports=router;

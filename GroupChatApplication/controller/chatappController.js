@@ -314,6 +314,14 @@ var isadmin = async (req, res, next) => {
         res.status(500).json({ Error: error, status: false })
     }
 }
+
+var getId=async (req, res, next) => {
+    try {
+        res.status(200).json({data:req.user,status:true})
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+}
 module.exports = {
     getChatAppPage,
     sendMessages,
@@ -329,5 +337,6 @@ module.exports = {
     makeUserAdmin,
     deleteUserFromGroup,
     isadmin,
-    getActiveUsers
+    getActiveUsers,
+    getId
 }
