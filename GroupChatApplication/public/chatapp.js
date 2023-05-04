@@ -2,11 +2,6 @@ import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 
 const socket = io("http://localhost:3000");
 
-socket.on('broadcast',()=>{
-    console.log("broadcast")
-    loadMessages();
-})
-
 const sendMessage = document.getElementById('sendMessage')
 const messageQueue = document.getElementById('messageQueue')
 const groups = document.getElementById('groups')
@@ -23,9 +18,83 @@ const pendingRequestsList = document.getElementById('pendingRequestsList');
 const memberList = document.getElementById('memberList');
 const membersBtn = document.getElementById('membersBtn')
 
+socket.on('broadcast', () => {
+    console.log("broadcast")
+    loadMessages();
+})
 
+socket.on('deleteGroupChat', (data) => {
+    try {
+        console.log("deletegorupchat")
 
-function sendMessages(e) {
+        // let actUser=document.getElementById('activeUser').innerHTML;
+        // let token = localStorage.getItem('token')
+        // let id=axios.get("http://localhost:3000/chatapp/getId/"+actUser,{ headers: { "Authorization": token } });
+        // if(id==data.deleteduserid && localStorage.getItem(groupId)==data.deletedGpId){
+        //     localStorage.delete("groupId");
+        //     localStorage.delete("oldmessages");
+        //     alert("Group modifications")
+        //   //  window.location.reload();
+        // }
+        
+        loadMessages();
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+//bi-directional flow for a notification when a group invite request is made
+socket.on("pendingRequestCheck",(data)=>{
+    try {
+        console.log("pendingRequestsCheck")
+        let actUser=document.getElementById('activeUser').innerHTML;
+        //console.log(actUser,username)
+        if(data.username==actUser){
+            alert("Check pending requests!");
+            window.location.reload();
+           
+        }        
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+//Joined notification
+var showJoinAcknowledgment = (username) => {
+    try {
+        let showUserJoined={};
+        let lastId = -1;
+        let grpId=localStorage.getItem("groupId")
+        if (localStorage.getItem("oldmessages") == null) {
+            localStorage.setItem("oldmessages", JSON.stringify())
+        }
+        else {
+            let oldmessageArray = JSON.parse(localStorage.getItem("oldmessages"));
+            if (oldmessageArray[oldmessageArray.length - 1].groupId != grpId) {
+                localStorage.removeItem("oldmessages");
+            } else {
+                lastId = oldmessageArray[oldmessageArray.length - 1].id;
+            }
+        }
+
+        showUserJoined = {
+            "id": lastId,
+            "message": username+ "Joined",
+            "createdAt": "2023-05-02T15:08:25.000Z",
+            "updatedAt": "2023-05-02T15:08:25.000Z",
+            "groupId": grpId
+        }
+
+        let oldmessageArray = JSON.parse(localStorage.getItem("oldmessages"));
+        localStorage.setItem("oldmessages", JSON.stringify(oldmessageArray.push(showUserJoined)))
+
+        addToMessagesList();
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+var sendMessages = (e) => {
     try {
         e.preventDefault()
         let grpId = localStorage.getItem('groupId') == null ? 0 : localStorage.getItem('groupId');
@@ -157,7 +226,6 @@ var loadMessages = async () => {
                 } else {
                     lastId = oldmessageArray[oldmessageArray.length - 1].id;
                 }
-
             }
             console.log(lastId);
 
@@ -204,6 +272,7 @@ var showusername = async () => {
         let token = localStorage.getItem('token');
         await axios.get("/chatapp/" + "getusername", { headers: { "Authorization": token } }).then(result => {
             document.getElementById('activeUser').innerHTML = result.data.username;
+            console.log("currentUser",typeof(document.getElementById('activeUser').innerHTML))
         }).catch(err => {
             console.log(err);
         })
@@ -231,6 +300,10 @@ var addGroups = (groupsArray) => {
             newElem.onclick = () => {
                 localStorage.setItem('groupId', element.id);
                 document.getElementById("activeGroup").innerHTML = element.name;
+
+                let username=document.getElementById('activeUser').innerHTML;
+                console.log("addGroupsusername",username);
+                showJoinAcknowledgment(username);
                 //newElem.classList.add = "btn-success";
                 newElem.style.backgroundColor = "green"
                 localStorage.removeItem("oldmessages");
@@ -414,7 +487,9 @@ var addJoinRequest = (listOfRequests) => {
                 let newElem = document.createElement('li');
                 newElem.classList = "list-group-item"
                 console.log(element.userId)
-                newElem.innerHTML = `Join request by ${element.invitationBy}`;
+                let token=localStorage.getItem('token')
+                let username = await axios.get("/chatapp/getusername" + "/" + element.invitationBy, { headers: { "Authorization": token } })
+                newElem.innerHTML = `Join request by ${username.data.username}`;
 
                 let acceptBtn = document.createElement('button');
                 acceptBtn.classList = "btn btn-primary"
@@ -435,6 +510,7 @@ var addJoinRequest = (listOfRequests) => {
                         result => {
                             alert("Group Request Accepted");
                             newElem.style.display = "none";
+                            window.location.reload();
                         }
                     )
                 }
@@ -517,7 +593,7 @@ var addUsersToMembersList = async (listOfMembers) => {
                 deleteBtn.onclick = async () => {
 
                     let isadmin = await axios.get("/chatapp/" + "isadmin/" + "token" + `/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
-                    if (isadmin.data.status) {
+                    if (isadmin.data.status==true) {
                         let myObj = {
                             "userid": listOfMembers[i].userId,
                             "groupID": listOfMembers[i].groupId
@@ -526,7 +602,8 @@ var addUsersToMembersList = async (listOfMembers) => {
                             result => {
                                 alert(JSON.stringify(result.data.message))
                                 newElem.style.display = "none";
-                                localStorage.removeItem("groupId")
+                               // localStorage.removeItem("groupId")
+                      
                             })
                     }
 
@@ -573,7 +650,7 @@ var showGroupsMemberList = async () => {
 document.addEventListener("DOMContentLoaded", loadMessages);
 document.addEventListener("DOMContentLoaded", getGroupsForUser)
 document.addEventListener('DOMContentLoaded', getGroupsJoinRequests);
-document.addEventListener('DOMContentLoaded', showusername)
+document.addEventListener('DOMContentLoaded', showusername);
 sendMessage.addEventListener('click', sendMessages);
 groupBtn.addEventListener('click', displayGroupForm);
 groupFormBtn.addEventListener('click', addGroup);

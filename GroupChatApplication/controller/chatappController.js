@@ -15,21 +15,21 @@ var getChatAppPage = async (req, res, next) => {
     }
 }
 
-var sendMessages = async (req,res,next,) => {
+var sendMessages = async (req, res, next,) => {
     try {
-      
+
         const { message, groupID } = req.body;
-        let createSuccessful=await messagesTB.create({
+        let createSuccessful = await messagesTB.create({
             message: message,
             userId: req.user.id,
             groupId: groupID
         })
-        if(createSuccessful){
-         console.log("socket called")
-           res.io.broadcast.emit('broadcast',{});
+        if (createSuccessful) {
+            console.log("socket called")
+            res.io.broadcast.emit('broadcast', {});
         }
         res.status(201).json({ message: "Message entry made into the database", status: true })
-        
+
     } catch (error) {
         res.status(500).json({ message: error, status: false })
     }
@@ -78,14 +78,14 @@ var getUsername = async (req, res, next) => {
     }
 }
 
-var getActiveUsers= async (req, res, next) => {
+var getActiveUsers = async (req, res, next) => {
     try {
         await UserTB.findOne({
-            where:{
-                id:req.user.id
+            where: {
+                id: req.user.id
             }
-        }).then(result=>{
-            res.status(200).json({username:result.username,status:true})
+        }).then(result => {
+            res.status(200).json({ username: result.username, status: true })
         })
     } catch (error) {
         console.log(error)
@@ -163,13 +163,13 @@ var getUsers = async (req, res, next) => {
 //making entries in the request table
 var userEntryForRequest = async (req, res, next) => {
     try {
-        const { userInvited,PhoneNumber,Email, groupID } = req.body;
+        const { userInvited, PhoneNumber, Email, groupID } = req.body;
 
         UserTB.findOne({
             where: {
                 username: userInvited,
-                phonenumber:PhoneNumber,
-                email:Email
+                phonenumber: PhoneNumber,
+                email: Email
             }
         }).then(result => {
             console.log("usernameidcheck", result.id, req.user.id);
@@ -183,6 +183,7 @@ var userEntryForRequest = async (req, res, next) => {
                     status: "pending"
                 }).then(insertedData => {
                     res.status(201).json({ data: insertedData, status: true })
+                    res.io.broadcast.emit('pendingRequestCheck', {"username":result.username});
                 }).catch(err => {
                     res.status(500).json({ Error: err, status: false })
                 })
@@ -270,16 +271,19 @@ var makeUserAdmin = async (req, res, next) => {
     }
 }
 
-var deleteUserFromGroup=  async (req, res, next) => {
+var deleteUserFromGroup = async (req, res, next) => {
     try {
         const { userid, groupID } = req.body;
         UserGroupsTB.destroy({
-            where:{
-                userId:userid,
-                groupId:groupID
+            where: {
+                userId: userid,
+                groupId: groupID
             }
-        }).then(result=>{
-            res.status(200).json({ message:"User deleted from group",data: result, status: true })
+        }).then(result => {
+           
+            res.status(200).json({ message: "User deleted from group", data: result, status: true })
+            res.io.emit("deleteGroupChat",{deletedGpId:groupID, deleteduserid:userid});
+           
         })
     } catch (error) {
         res.status(500).json({ Error: error, status: false })
@@ -287,23 +291,23 @@ var deleteUserFromGroup=  async (req, res, next) => {
 
 }
 
-var isadmin=  async (req, res, next) => {
+var isadmin = async (req, res, next) => {
     try {
-        let {userID,groupID}= req.params;
+        let { userID, groupID } = req.params;
         console.log(userID)
-        if(userID=="token"){
+        if (userID == "token") {
             console.log("check")
-            userID=req.user.id;
+            userID = req.user.id;
         }
-        console.log("dekho",userID,groupID);
+        console.log("dekho", userID, groupID);
         admin.findOne({
-            where:{
-                userId:userID,
-                groupId:groupID,
-                status:true
+            where: {
+                userId: userID,
+                groupId: groupID,
+                status: true
             }
-        }).then(result=>{
-           
+        }).then(result => {
+
             res.status(200).json({ data: result, status: true })
         })
     } catch (error) {
