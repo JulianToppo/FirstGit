@@ -10,6 +10,7 @@ const messages = require('./model/messages')
 const groups = require('./model/groups')
 const usergroups = require('./model/user-groups')
 const inviteRequests = require('./model/inviteRequest')
+const fileUploads = require('./model/fileUploads')
 const admin = require('./model/admin')
 
 const cors = require('cors')
@@ -17,20 +18,22 @@ const fs = require('fs');
 const Axios = require('axios');
 const morgan = require('morgan')
 const path = require('path');
-const { Socket } = require('socket.io');
+const fileUpload = require('express-fileupload');
 
 const port = 3000;
 const app = express();
-const server= require('http').createServer(app)
-const io = require('socket.io')(server,{
-    cors:{
-        origin:'*'
+const server = require('http').createServer(app)
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*'
     }
 });
+
 var s;
-io.on('connection',socket =>{
+
+io.on('connection', socket => {
     console.log(socket.id)
-  s=socket;
+    s=socket;
 })
 
 Axios.default.baseURL = process.env.HOST_IPADDRESS;
@@ -47,13 +50,12 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 app.use(morgan('combined', { stream: accessLogStream }))
 app.use(bodyParser.json({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(function(req, res, next){
-    // res.io = io;
-    // next();
-    res.io=s;
+app.use(fileUpload());
+app.use(function (req, res, next) {
+    req.io = io;
+  //  req.socket=s;
     next();
-
-  });
+});
 
 app.use(signupRoutes);
 app.use(loginRoutes);
@@ -81,6 +83,13 @@ admin.belongsTo(groups);
 
 user.hasMany(admin)
 admin.belongsTo(user);
+
+user.hasMany(fileUploads);
+fileUploads.belongsTo(user)
+
+
+fileUploads.hasOne(messages)
+messages.belongsTo(fileUploads);
 
 sequelize.sync({}).then(result => {
     server.listen(port);

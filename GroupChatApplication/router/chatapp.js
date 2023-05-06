@@ -1,6 +1,7 @@
 const express= require('express')
 const chatAppController= require('../controller/chatappController')
 const authorization=require('../middlewares/authorization')
+const fileUpload = require('express-fileupload');
 const router=express.Router();
 
 router.get('/chatapp',chatAppController.getChatAppPage);
@@ -19,5 +20,6 @@ router.post('/chatapp/makeadmin',authorization.authorizationUser,chatAppControll
 router.post('/chatapp/deleteUserFromGroup',authorization.authorizationUser,chatAppController.deleteUserFromGroup);
 router.get('/chatapp/isadmin/:userID/:groupID',authorization.authorizationUser,chatAppController.isadmin);
 router.get('/chatapp/getid',authorization.authorizationUser,chatAppController.getId);
+router.get('/chatapp/getfile/:fileID',authorization.authorizationUser,chatAppController.getFileUrl);
 
 module.exports=router;

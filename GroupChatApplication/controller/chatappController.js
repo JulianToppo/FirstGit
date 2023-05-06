@@ -6,8 +6,12 @@ const { Op } = require("sequelize");
 const UserGroupsTB = require('../model/user-groups');
 const inviteRequests = require('../model/inviteRequest')
 const admin = require('../model/admin')
+const AWS = require('aws-sdk');
+const sequelize = require("../util/database")
+const fileUploads = require('../model/fileUploads')
 
 var getChatAppPage = async (req, res, next) => {
+
     try {
         res.sendFile(path.join(__dirname, "..", "views", "chatapppage.html"))
     } catch (error) {
@@ -15,22 +19,77 @@ var getChatAppPage = async (req, res, next) => {
     }
 }
 
-var sendMessages = async (req, res, next,) => {
-    try {
+var uploadToS3 = (data, filename) => {
+    console.log("inside upload to s3");
+    const BUCKET_NAME = process.env.BUCKET_NAME;
+    const IAM_USER_KEY = process.env.IAM_USER_KEY;
+    const IAM_USER_SECRET = process.env.IAM_USER_SECRET
 
-        const { message, groupID } = req.body;
-        let createSuccessful = await messagesTB.create({
-            message: message,
-            userId: req.user.id,
-            groupId: groupID
+    console.log(BUCKET_NAME);
+    var s3bucket = new AWS.S3({
+        accessKeyId: IAM_USER_KEY,
+        secretAccessKey: IAM_USER_SECRET,
+    })
+
+    var params = {
+        Bucket: BUCKET_NAME,
+        Key: filename,
+        Body: data,
+        ACL: 'public-read' //access control list
+    }
+
+    console.log("after params")
+
+    return new Promise((resolve, reject) => {
+        s3bucket.upload(params, (err, s3reponse) => {
+            if (err) {
+                console.log("Something went wrong", err);
+                reject(err);
+            } else {
+                console.log("Success", s3reponse);
+                resolve(s3reponse.Location);
+            }
         })
-        if (createSuccessful) {
-            console.log("socket called")
-            res.io.broadcast.emit('broadcast', {});
-        }
-        res.status(201).json({ message: "Message entry made into the database", status: true })
+    })
+}
 
+var sendMessages = async (req, res, next,) => {
+    const t = await sequelize.transaction();
+    try {
+        console.log("Send messages called")
+        const { message, groupID } = req.body;
+        console.log(message, groupID)
+        let fileUploadCreated;
+        let createSuccessful;
+        if (req.files != null) {
+            let filename = req.user.id + "/" + req.files.file.name;
+            const fileContent = Buffer.from(req.files.file.data, 'binary');
+
+            const S3fileURL = await uploadToS3(fileContent, filename);
+            fileUploadCreated = await fileUploads.create({
+                fileURL: S3fileURL,
+                userId: req.user.id
+            }, { transaction: t })
+            createSuccessful = await messagesTB.create({
+                message: message,
+                userId: req.user.id,
+                groupId: groupID,
+                fileUploadId: req.files != null ? fileUploadCreated.id : 0
+            }, { transaction: t })
+
+        }
+        else {
+            await messagesTB.create({
+                message: message,
+                userId: req.user.id,
+                groupId: groupID,
+            }, { transaction: t })
+        }
+        await t.commit();
+        res.status(201).json({ message: "Message entry made into the database", status: true })
+        req.io.emit('showmessages', { groupId: groupID, userId: req.user.id });
     } catch (error) {
+        await t.rollback();
         res.status(500).json({ message: error, status: false })
     }
 }
@@ -50,13 +109,16 @@ var getMessages = async (req, res, next) => {
             }
         })
         console.log(userMessages.length)
+
         res.status(200).json({ message: "User Messages retrieved", messages: userMessages, status: true })
     } catch (error) {
+
         res.status(500).json({ message: error, status: false })
     }
 }
 
 var getUsername = async (req, res, next) => {
+
     try {
         const { userId } = req.params;
         if (userId == req.user.id) {
@@ -67,9 +129,9 @@ var getUsername = async (req, res, next) => {
                 where: {
                     id: userId
                 }
-            }).then(result => {
+            }).then(async result => {
                 res.status(200).json({ username: result.username, status: true })
-            }).catch(error => {
+            }).catch(async error => {
                 res.status(500).json({ message: error, status: false })
             })
         }
@@ -79,20 +141,24 @@ var getUsername = async (req, res, next) => {
 }
 
 var getActiveUsers = async (req, res, next) => {
+
     try {
         await UserTB.findOne({
             where: {
                 id: req.user.id
             }
-        }).then(result => {
+        }).then(async result => {
+
             res.status(200).json({ username: result.username, status: true })
         })
     } catch (error) {
+
         console.log(error)
     }
 }
 
 var getGroups = async (req, res, next) => {
+
     try {
         // console.log("userIDdddddddd", req.user.id)
         await UserTB.findAll({
@@ -108,9 +174,11 @@ var getGroups = async (req, res, next) => {
             },
             include: groupTB
         }
-        ).then(result => {
+        ).then(async result => {
+
             res.status(200).json({ groups: result, status: true })
-        }).catch(err => {
+        }).catch(async err => {
+
             console.log(err)
             res.status(500).json({ error: err, status: false })
         })
@@ -120,6 +188,7 @@ var getGroups = async (req, res, next) => {
 }
 
 var addGroup = async (req, res, next) => {
+
     try {
         const { groupName } = req.body;
         console.log("groupname", groupName)
@@ -134,15 +203,20 @@ var addGroup = async (req, res, next) => {
                 groupId: result.id
             })
             if (addUserGroup.length < 1) {
+
                 res.status(500).json({ Error: addUserGroup, status: false })
             }
             if (adminEntry.length < 1) {
+
                 res.status(500).json({ Error: adminEntry, status: false })
             }
+
             res.status(201).json({ data: result, status: true })
-        }).catch(err => {
+        }).catch(async err => {
+
             res.status(500).json({ Error: err, status: false })
         })
+
     } catch (error) {
         res.status(500).json({ Error: error, status: false })
     }
@@ -162,16 +236,18 @@ var getUsers = async (req, res, next) => {
 
 //making entries in the request table
 var userEntryForRequest = async (req, res, next) => {
+    const t = await sequelize.transaction();
     try {
         const { userInvited, PhoneNumber, Email, groupID } = req.body;
-
-        UserTB.findOne({
+        console.log("inside user Request", userInvited, PhoneNumber, Email, groupID)
+        await UserTB.findOne({
             where: {
                 username: userInvited,
                 phonenumber: PhoneNumber,
                 email: Email
             }
         }).then(result => {
+
             console.log("usernameidcheck", result.id, req.user.id);
             if (result.id == req.user.id) {
                 throw new Error("User can't sent invite to himself!")
@@ -181,18 +257,22 @@ var userEntryForRequest = async (req, res, next) => {
                     userId: result.id,
                     groupId: groupID,
                     status: "pending"
-                }).then(insertedData => {
+                }, { transaction: t }).then(async insertedData => {
+                    await t.commit();
                     res.status(201).json({ data: insertedData, status: true })
-                    res.io.broadcast.emit('pendingRequestCheck', {"username":result.username});
-                }).catch(err => {
+                    req.io.emit('pendingRequestCheck', { username: result.username });
+                }).catch(async err => {
+                    await t.rollback();
                     res.status(500).json({ Error: err, status: false })
                 })
             }
 
-        }).catch(err => {
+        }).catch(async err => {
+            await t.rollback();
             res.status(500).json({ Error: err, status: false })
         })
     } catch (error) {
+        await t.rollback();
         res.status(500).json({ Error: error, status: false })
     }
 }
@@ -212,13 +292,14 @@ var getRequestList = async (req, res, next) => {
 }
 
 var updateGroups = async (req, res, next) => {
+    const t = await sequelize.transaction();
     try {
         const { groupID, invitedBy } = req.body;
         // console.log(groupID)
         await UserGroupsTB.create({
             userId: req.user.id,
             groupId: groupID
-        }).then(
+        }, { transaction: t }).then(
             result => {
                 inviteRequests.update({
                     status: "accepted"
@@ -229,13 +310,14 @@ var updateGroups = async (req, res, next) => {
                             groupId: groupID,
                             userId: req.user.id
                         }
-                    })
+                    }, { transaction: t })
 
                 res.status(201).json({ data: result, status: true })
             }
         )
-
+        await t.commit();
     } catch (error) {
+        await t.rollback();
         res.status(500).json({ Error: error, status: false })
     }
 }
@@ -257,21 +339,25 @@ var getUsersInGroup = async (req, res, next) => {
 }
 
 var makeUserAdmin = async (req, res, next) => {
+    const t = await sequelize.transaction();
     try {
         const { userid, groupID } = req.body;
         await admin.create({
             status: true,
             userId: userid,
             groupId: groupID
-        }).then(result => {
+        }, { transaction: t }).then(async result => {
+            await t.commit();
             res.status(201).json({ data: result, status: true })
         })
     } catch (error) {
+        await t.rollback();
         res.status(500).json({ Error: error, status: false })
     }
 }
 
 var deleteUserFromGroup = async (req, res, next) => {
+    const t = await sequelize.transaction();
     try {
         const { userid, groupID } = req.body;
         UserGroupsTB.destroy({
@@ -279,13 +365,14 @@ var deleteUserFromGroup = async (req, res, next) => {
                 userId: userid,
                 groupId: groupID
             }
-        }).then(result => {
-           
+        }, { transaction: t }).then(async result => {
+            await t.commit();
             res.status(200).json({ message: "User deleted from group", data: result, status: true })
-            res.io.emit("deleteGroupChat",{deletedGpId:groupID, deleteduserid:userid});
-           
+            req.io.emit("deleteGroupChat", { deletedGpId: groupID, deleteduserid: userid });
+
         })
     } catch (error) {
+        await t.rollback();
         res.status(500).json({ Error: error, status: false })
     }
 
@@ -299,7 +386,7 @@ var isadmin = async (req, res, next) => {
             console.log("check")
             userID = req.user.id;
         }
-        console.log("dekho", userID, groupID);
+        console.log("userID", userID)
         admin.findOne({
             where: {
                 userId: userID,
@@ -307,21 +394,41 @@ var isadmin = async (req, res, next) => {
                 status: true
             }
         }).then(result => {
+            if (result == null) {
+                res.status(200).json({ data: result, status: false })
+            } else {
+                res.status(200).json({ data: result, status: true })
+            }
 
-            res.status(200).json({ data: result, status: true })
         })
     } catch (error) {
         res.status(500).json({ Error: error, status: false })
     }
 }
 
-var getId=async (req, res, next) => {
+var getId = async (req, res, next) => {
     try {
-        res.status(200).json({data:req.user,status:true})
+        res.status(200).json({ data: req.user, status: true })
     } catch (error) {
         res.status(500).json({ Error: error, status: false })
     }
 }
+
+var getFileUrl = async (req, res, next) => {
+    try {
+        const { fileID } = req.params;
+        await fileUploads.findOne({
+            where: {
+                id: fileID
+            }
+        }).then(result => {
+            res.status(200).json({ data: result.fileURL, status: true })
+        })
+    } catch (error) {
+        res.status(500).json({ Error: error, status: false })
+    }
+}
+
 module.exports = {
     getChatAppPage,
     sendMessages,
@@ -338,5 +445,6 @@ module.exports = {
     deleteUserFromGroup,
     isadmin,
     getActiveUsers,
-    getId
+    getId,
+    getFileUrl
 }

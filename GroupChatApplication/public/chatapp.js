@@ -1,5 +1,5 @@
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-
+// import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+import { io } from "socket.io-client";
 const socket = io("http://localhost:3000");
 
 const sendMessage = document.getElementById('sendMessage')
@@ -18,28 +18,33 @@ const pendingRequestsList = document.getElementById('pendingRequestsList');
 const memberList = document.getElementById('memberList');
 const membersBtn = document.getElementById('membersBtn')
 
-socket.on('broadcast', () => {
-    console.log("broadcast")
-    loadMessages();
-})
 
-socket.on('deleteGroupChat', (data) => {
+socket.on('deleteGroupChat', async (data) => {
     try {
         console.log("deletegorupchat")
-
-        // let actUser=document.getElementById('activeUser').innerHTML;
-        // let token = localStorage.getItem('token')
-        // let id=axios.get("http://localhost:3000/chatapp/getId/"+actUser,{ headers: { "Authorization": token } });
-        // if(id==data.deleteduserid && localStorage.getItem(groupId)==data.deletedGpId){
-        //     localStorage.delete("groupId");
-        //     localStorage.delete("oldmessages");
-        //     alert("Group modifications")
-        //   //  window.location.reload();
-        // }
+        let token = localStorage.getItem('token')
+        let id = await axios.get("http://localhost:3000/chatapp/getId", { headers: { "Authorization": token } });
+        if ((id.data.data.id == data.deleteduserid) && (localStorage.getItem("groupId") == data.deletedGpId)) {
+            localStorage.removeItem("groupId");
+            localStorage.removeItem("oldmessages");
+            alert("Group modifications")
+            window.location.reload();
+        }
 
         loadMessages();
     } catch (error) {
         console.log(error);
+    }
+})
+
+socket.on('showmessages', async (data) => {
+    console.log("broadcast")
+    let token = localStorage.getItem('token')
+    let id = await axios.get("http://localhost:3000/chatapp" + "/getid", { headers: { "Authorization": token } })
+    console.log("localstorage", localStorage.getItem("groupId"), data.groupId, id.data.data.id, data.userId)
+    if ((localStorage.getItem("groupId") == data.groupId) && (id.data.data.id != data.userId)) {
+        console.log("Socket LoadMessage")
+        loadMessages();
     }
 })
 
@@ -60,7 +65,7 @@ socket.on("pendingRequestCheck", (data) => {
 })
 
 //Joined notification
-var showJoinAcknowledgment = async() => {
+var showJoinAcknowledgment = async () => {
     try {
         let showUserJoined = {};
         let lastId = -1;
@@ -79,7 +84,7 @@ var showJoinAcknowledgment = async() => {
             lastId = newmessagesArray[newmessagesArray.length - 1].id;
         }
 
-        let token=localStorage.getItem('token')
+        let token = localStorage.getItem('token')
         let id = await axios.get("http://localhost:3000/chatapp" + "/getid", { headers: { "Authorization": token } })
         showUserJoined = {
             "id": lastId,
@@ -108,17 +113,23 @@ var sendMessages = (e) => {
             grpAlert.style.display = ''
         } else {
             let message = document.getElementById('message').value
+            const fileInput = document.getElementById('image').files[0];
             if (message == '') {
                 alert('Fill the message value')
             }
             else {
-                var myobj = {
-                    "message": message,
-                    "groupID": grpId
-                }
+                var formData = new FormData();
+                formData.append("message", message);
+                formData.append("groupID", grpId);
+                formData.append("file", fileInput);
+                // var myobj = {
+                //     "message": message,
+                //     "groupID": grpId,
+                //     "file":fileInput
+                // }
 
                 let token = localStorage.getItem('token')
-                axios.post("/chatapp/sendmessage", myobj, { headers: { "Authorization": token } }).then((result) => {
+                axios.post("/chatapp/sendmessage", formData, { headers: { "Authorization": token } }).then((result) => {
                     loadMessages();
                 }).catch(err => {
                     console.log(err)
@@ -138,19 +149,10 @@ var printMessages = async (listCheckForValues, oldmessageArray) => {
     try {
 
         console.log(listCheckForValues)
-        for (let i = 0; i < listCheckForValues.length; i++) {
+        let i = Math.max(0, listCheckForValues.length - 10);
+        for (; i < listCheckForValues.length; i++) {
             let token = localStorage.getItem('token')
             let username = await axios.get("/chatapp/getusername" + "/" + listCheckForValues[i].userId, { headers: { "Authorization": token } })
-            //     result => {
-            //         elem.innerHTML = result.data.username + " : " + element.message;
-            //         count++;
-            //         console.log("inside")
-            //         messageQueue.appendChild(elem);
-            //     }
-            // ).catch(err => {
-            //     console.log(err)
-            // })
-            console.log(listCheckForValues[i])
             console.log(username.data.username);
             let elem = document.createElement('li');
 
@@ -160,15 +162,31 @@ var printMessages = async (listCheckForValues, oldmessageArray) => {
             } else {
                 elem.classList = "list-group-item list-group-item-light"
             }
+
+            if (username.data.username == "You") {
+                elem.classList += " text-left"
+            } else {
+                elem.classList += " text-end"
+            }
             elem.innerHTML = username.data.username + " : " + listCheckForValues[i].message;
 
+            if (listCheckForValues[i].fileUploadId != null) {
+
+                elem.appendChild(document.createElement("br"))
+                let imagesrc = document.createElement('img');
+
+                let srcUrl = await axios.get('/chatapp/getfile/' + listCheckForValues[i].fileUploadId, { headers: { "Authorization": token } })
+                imagesrc.src = srcUrl.data.data
+                imagesrc.style.width = '25%'
+                imagesrc.style.height = '25%'
+                elem.appendChild(imagesrc)
+            }
             messageQueue.appendChild(elem);
 
-
-            if (oldmessageArray.length != 0 && oldmessageArray.length > 10) {
-                console.log("Excess messages")
-                oldmessageArray.shift();
-            }
+            // if (oldmessageArray.length != 0 && oldmessageArray.length > 10) {
+            //     console.log("Excess messages")
+            //     oldmessageArray.shift();
+            // }
             if (messageQueue.getElementsByTagName('li').length > 10) {
                 messageQueue.removeChild(messageQueue.firstElementChild);
             }
@@ -191,18 +209,15 @@ var addToMessagesList = async (flag = 0) => {
         if (flag == 1) {
             await showJoinAcknowledgment();
         }
-        
+
         let oldmessageArray = JSON.parse(localStorage.getItem("oldmessages"));
         let newmessageArray = JSON.parse(localStorage.getItem("newmessages"))
 
-       
-        // oldmessageArray=oldmessageArray?oldmessageArray:[];
-        await printMessages(oldmessageArray, oldmessageArray).then(async result => {
-            await printMessages(newmessageArray, oldmessageArray);
-        });
-
         oldmessageArray.push(...newmessageArray);
-        localStorage.setItem("oldmessages", JSON.stringify(oldmessageArray))
+
+        await printMessages(oldmessageArray, oldmessageArray);
+
+        //  localStorage.setItem("oldmessages", JSON.stringify(oldmessageArray))
 
 
     } catch (error) {
@@ -212,7 +227,6 @@ var addToMessagesList = async (flag = 0) => {
 
 var loadMessages = async (check = 0) => {
     try {
-        // e.preventDefault();
         console.log("loadMessages called")
         let lastId;
 
@@ -265,8 +279,9 @@ var loadMessages = async (check = 0) => {
     }
 }
 
-var loadMessagesWithJoinedAcknowledgement = () => {
+var loadMessagesWithJoinedAcknowledgement = (e) => {
     try {
+        e.preventDefault();
         loadMessages(0);
     } catch (err) {
         console.log(err);
@@ -299,6 +314,7 @@ var showusername = async () => {
 var addGroups = (groupsArray) => {
     try {
         let count = 0;
+        groups.innerHTML = ""
         groupsArray.forEach(element => {
 
             let newElem = document.createElement('li')
@@ -320,8 +336,9 @@ var addGroups = (groupsArray) => {
 
                 //newElem.classList.add = "btn-success";
                 newElem.style.backgroundColor = "green"
+                addGroups(groupsArray)
                 localStorage.removeItem("oldmessages");
-                // window.location.reload();
+                //window.location.reload();
 
                 loadMessages(1)
             }
@@ -333,8 +350,9 @@ var addGroups = (groupsArray) => {
     }
 }
 
-var getGroupsForUser = () => {
+var getGroupsForUser = (e) => {
     try {
+        e.preventDefault();
         let token = localStorage.getItem("token");
         axios.get("/chatapp" + "/getgroups", { headers: { "Authorization": token } }).then(
             result => {
@@ -348,8 +366,9 @@ var getGroupsForUser = () => {
 }
 
 //Hiding and displaying the group form
-var displayGroupForm = () => {
+var displayGroupForm = (e) => {
     try {
+        e.preventDefault();
         const groupForm = document.getElementById('groupForm');
         if (groupForm.style.display == "none") {
             groupForm.style.display = "";
@@ -470,6 +489,7 @@ var sendInvite = async (e) => {
         )
     } catch (error) {
         alert('Check user credentials')
+        console.log(error.data.Error)
         let inviteForm = document.getElementById('inviteform');
         inviteForm.style.display = "none";
     }
@@ -587,7 +607,8 @@ var addUsersToMembersList = async (listOfMembers) => {
                 deleteBtn.innerHTML = "Delete"
 
 
-                acceptBtn.onclick = async () => {
+                acceptBtn.onclick = async (e) => {
+                    e.preventDefault();
                     let myObj = {
                         "userid": listOfMembers[i].userId,
                         "groupID": listOfMembers[i].groupId
@@ -604,8 +625,9 @@ var addUsersToMembersList = async (listOfMembers) => {
                     )
                 }
 
-                deleteBtn.onclick = async () => {
+                deleteBtn.onclick = async (e) => {
 
+                    e.preventDefault();
                     let isadmin = await axios.get("/chatapp/" + "isadmin/" + "token" + `/${listOfMembers[i].groupId}`, { headers: { "Authorization": token } })
                     if (isadmin.data.status == true) {
                         let myObj = {
@@ -634,8 +656,9 @@ var addUsersToMembersList = async (listOfMembers) => {
     }
 }
 
-var showGroupsMemberList = async () => {
+var showGroupsMemberList = async (e) => {
     try {
+        e.preventDefault();
         console.log("inside memberslist")
         if (memberList.style.display == "") {
             console.log("display mat dikh")
@@ -659,6 +682,8 @@ var showGroupsMemberList = async () => {
         console.log(error)
     }
 }
+
+
 
 //setInterval refreshes the page after defined milliseconds
 document.addEventListener("DOMContentLoaded", loadMessagesWithJoinedAcknowledgement);
