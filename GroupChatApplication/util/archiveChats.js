@@ -1,5 +1,5 @@
-const archivedChat = require('./model/archivedChat')
-const messages = require('./model/messages')
+const archivedChat = require('../model/archivedChat')
+const messages = require('../model/messages')
 const { Op } = require('sequelize')
 
 var archiveChats = async () => {
@@ -15,12 +15,12 @@ var archiveChats = async () => {
         await messages.destroy({
             where: {
                 createdAt: {
-                    [Op.gte]: moment().subtract(1, 'days').toDate()
+                    [Op.lte]: moment().subtract(1, 'days').toDate()
                 }
             }
         })
 
-        archiveChats.bulkCreate(allUser, { returning: true })
+        await archivedChat.bulkCreate(allUser, { returning: true })
     }
     catch (error) {
         console.log(error)
