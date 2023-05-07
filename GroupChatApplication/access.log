@@ -1,5 +1,0 @@
-::1 - - [06/May/2023:13:50:06 +0000] "GET /chatapp HTTP/1.1" 304 - "http://localhost:3000/chatapp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-::1 - - [06/May/2023:13:50:06 +0000] "GET /chatapp.js HTTP/1.1" 200 25286 "http://localhost:3000/chatapp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-::1 - - [06/May/2023:13:50:06 +0000] "GET /chatapp/getgroups HTTP/1.1" 200 483 "http://localhost:3000/chatapp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-::1 - - [06/May/2023:13:50:06 +0000] "GET /chatapp/getRequests HTTP/1.1" 304 - "http://localhost:3000/chatapp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-::ffff:127.0.0.1 - - [06/May/2023:13:50:06 +0000] "GET /chatapp/getusername HTTP/1.1" 304 - "http://localhost:3000/chatapp" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"

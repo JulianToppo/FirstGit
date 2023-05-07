@@ -1,5 +1,6 @@
 const path = require('path')
 const messagesTB = require('../model/messages')
+const archiveChats=require('../model/archivedChat')
 const UserTB = require('../model/user')
 const groupTB = require('../model/groups')
 const { Op } = require("sequelize");
@@ -19,6 +20,7 @@ var getChatAppPage = async (req, res, next) => {
     }
 }
 
+// Uploads the file to s3bucket in aws
 var uploadToS3 = (data, filename) => {
     console.log("inside upload to s3");
     const BUCKET_NAME = process.env.BUCKET_NAME;
@@ -53,6 +55,8 @@ var uploadToS3 = (data, filename) => {
     })
 }
 
+//Retrives and uploads the messages for corresponding groups and user with realtime update
+//in connected socket-clients
 var sendMessages = async (req, res, next,) => {
     const t = await sequelize.transaction();
     try {
@@ -117,6 +121,7 @@ var getMessages = async (req, res, next) => {
     }
 }
 
+//Getting the username from user-id as parameter
 var getUsername = async (req, res, next) => {
 
     try {
@@ -140,6 +145,7 @@ var getUsername = async (req, res, next) => {
     }
 }
 
+//Active username
 var getActiveUsers = async (req, res, next) => {
 
     try {
@@ -162,13 +168,6 @@ var getGroups = async (req, res, next) => {
     try {
         // console.log("userIDdddddddd", req.user.id)
         await UserTB.findAll({
-            // include: [{
-            //     // through: {
-            //     //     where: {
-            //     //         userId: req.user.id
-            //     //     }
-            //     // }
-            // }]
             where: {
                 id: req.user.id
             },
@@ -197,15 +196,16 @@ var addGroup = async (req, res, next) => {
         }).then(async result => {
             //Linking the tables user and groups
             let addUserGroup = await req.user.addGroup(result);
+            if (addUserGroup.length < 1) {
+
+                res.status(500).json({ Error: addUserGroup, status: false })
+            }
             let adminEntry = await admin.create({
                 status: true,
                 userId: req.user.id,
                 groupId: result.id
             })
-            if (addUserGroup.length < 1) {
-
-                res.status(500).json({ Error: addUserGroup, status: false })
-            }
+          
             if (adminEntry.length < 1) {
 
                 res.status(500).json({ Error: adminEntry, status: false })
@@ -222,6 +222,7 @@ var addGroup = async (req, res, next) => {
     }
 }
 
+//Get all the users
 var getUsers = async (req, res, next) => {
     try {
         await UserTB.findAll().then(
