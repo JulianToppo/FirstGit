@@ -122,12 +122,7 @@ var sendMessages = (e) => {
                 formData.append("message", message);
                 formData.append("groupID", grpId);
                 formData.append("file", fileInput);
-                // var myobj = {
-                //     "message": message,
-                //     "groupID": grpId,
-                //     "file":fileInput
-                // }
-
+        
                 let token = localStorage.getItem('token')
                 axios.post("/chatapp/sendmessage", formData, { headers: { "Authorization": token } }).then((result) => {
                     loadMessages();
