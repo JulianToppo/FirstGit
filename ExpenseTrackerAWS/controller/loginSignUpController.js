@@ -1,5 +1,7 @@
 
 const path = require('path')
+const dotenv = require('dotenv');
+dotenv.config();
 const user = require('../model/user')
 const forgotPasswordRequests = require('../model/forgotPasswordRequests')
 const bcrypt = require('bcrypt');
@@ -148,8 +150,9 @@ var forgotPassword = async (req, res, next) => {
 
         })
 
-        const message = 'http://localhost:3000/password/resetpassword/' + uniqueId;
+        const message = process.env.HOST_IPADDRESS+ '/password/resetpassword/' + uniqueId;
 
+        console.log("message",message);
 
         console.log("email", email);
         mail.sendMails(email, message);

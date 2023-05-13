@@ -19,7 +19,7 @@ const updatePassword=async (e)=>{
                 "password": password
             };
     
-            await axios.post("http://localhost:3000/password/updatePassword", myObj)
+            await axios.post("/password/updatePassword", myObj)
             .then(response =>{
                 console.log(response.data.Message);
                 window.location="/"
