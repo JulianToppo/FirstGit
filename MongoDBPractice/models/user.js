@@ -20,6 +20,10 @@ class User {
       })
   }
 
+  getCart() {
+    return this.cart;
+  }
+
   addToCart(product) {
     // const cartProduct=this.cart.items.findIndex(cp=>{
     //   return cp._id===product._id;
@@ -59,6 +63,25 @@ class User {
 
   }
 
+  getCart() {
+    const db = getDb();
+    const productIds = this.cart.items.map(i => {
+      return i.productId;
+    })
+    return db.collection('products').find({ _id: { $in: productIds } }).toArray()
+      .then(products => {
+        return products.map(p => {
+          return {
+            ...p,
+            quantity: this.cart.items.find(i => {
+              return i.productId.toString() == p._id.toString();
+            }).quantity
+          };
+        })
+      });
+
+  }
+
   static findUserById(userId) {
     const db = getDb();
     return db.collection('users')
@@ -71,22 +94,21 @@ class User {
         console.log(err);
       }); //next is used to return the single element 
   }
+
+
+  deleteItemsFromCart(productId) {
+    console.log("inside delete carts")
+    const updatedCartItems = this.cart.items.filter(item => {
+      return item.productId.toString() !== productId.toString();
+    });
+
+    console.log("productId",productId.toString(),"upadtedItems",updatedCartItems);
+    const db = getDb();
+    return db.collection('users')
+      .updateOne(
+        { _id: new ObjectId(this._id) },
+        { $set: { cart: { items: updatedCartItems } } }
+      )
+  }
 }
-
-
-// const Sequelize = require('sequelize');
-
-// const sequelize = require('../util/database');
-
-// const User = sequelize.define('user', {
-//   id: {
-//     type: Sequelize.INTEGER,
-//     autoIncrement: true,
-//     allowNull: false,
-//     primaryKey: true
-//   },
-//   name: Sequelize.STRING,
-//   email: Sequelize.STRING
-// });
-
 module.exports = User;
