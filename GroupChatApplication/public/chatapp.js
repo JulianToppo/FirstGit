@@ -418,7 +418,7 @@ var addUsersForInvite = (usersList) => {
             let newElemEmail = document.createElement('option');
             // newElem.id=element.id;
             newElemEmail.innerHTML = usersList[i].email;
-            phonenumerList.appendChild(newElemEmail);
+            emailList.appendChild(newElemEmail);
         }
     } catch (error) {
         console.log(error)
@@ -449,7 +449,7 @@ var sendInvite = async (e) => {
 
         usersOptionsList="";
         phonenumerList="";
-        phonenumerList="";
+        emailList="";
 
         if (userInvited == '' || phonenumer == '' || email == '') {
             return;
