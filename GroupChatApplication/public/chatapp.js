@@ -9,7 +9,7 @@ const groupBtn = document.getElementById('groupBtn')
 const groupFormBtn = document.getElementById('submitGroupName')
 const grpAlert = document.getElementById('groupAlert')
 const inviteBtn = document.getElementById('inviteUsersBtn')
-const users = document.getElementById('users');
+const usersOptionsList = document.getElementById('users');
 const phonenumerList = document.getElementById('phonenumerList');
 const emailList = document.getElementById('emailList');
 const submitUserInviteName = document.getElementById('submitUserInviteName');
@@ -122,7 +122,7 @@ var sendMessages = (e) => {
                 formData.append("message", message);
                 formData.append("groupID", grpId);
                 formData.append("file", fileInput);
-        
+
                 let token = localStorage.getItem('token')
                 axios.post("/chatapp/sendmessage", formData, { headers: { "Authorization": token } }).then((result) => {
                     loadMessages();
@@ -408,7 +408,7 @@ var addUsersForInvite = (usersList) => {
             let newElemUsername = document.createElement('option');
             // newElem.id=element.id;
             newElemUsername.innerHTML = usersList[i].username;
-            users.appendChild(newElemUsername);
+            usersOptionsList.appendChild(newElemUsername);
 
             let newElemPhonenumber = document.createElement('option');
             // newElem.id=element.id;
@@ -427,14 +427,7 @@ var addUsersForInvite = (usersList) => {
 
 var showInviteForm = async (e) => {
     try {
-        e.preventDefault();
-        let inviteForm = document.getElementById('inviteform');
-        if (inviteForm.style.display == '') {
-            inviteForm.style.display = "none";
-            return;
-        }
-
-        document.getElementById('inviteform').style.display = '';
+        e.preventDefault();        
         let token = localStorage.getItem("token");
         await axios.get("/chatapp" + "/getusers", { headers: { "Authorization": token } }).then(
             result => {
@@ -453,6 +446,10 @@ var sendInvite = async (e) => {
         let userInvited = document.getElementById('userInviteList').value;
         let phonenumer = document.getElementById('phonenumer').value;
         let email = document.getElementById('email').value;
+
+        usersOptionsList="";
+        phonenumerList="";
+        phonenumerList="";
 
         if (userInvited == '' || phonenumer == '' || email == '') {
             return;
@@ -480,6 +477,7 @@ var sendInvite = async (e) => {
                 //add phone number and email
                 alert("Invite sent to " + userInvited);
 
+
             }
         )
     } catch (error) {
@@ -503,8 +501,6 @@ var showPendingRequests = (e) => {
     } catch (error) {
         console.log(error)
     }
-
-
 }
 
 //Display the pending requests to be answered
@@ -655,24 +651,21 @@ var showGroupsMemberList = async (e) => {
     try {
         e.preventDefault();
         console.log("inside memberslist")
-        if (memberList.style.display == "") {
-            console.log("display mat dikh")
-            memberList.style.display = "none";
-        } else {
-            console.log("inside dikh")
-            memberList.style.display = "";
-            let grpId = localStorage.getItem('groupId') == null ? 0 : localStorage.getItem('groupId');
-            if (grpId == 0) {
-                throw new Error("No Group selected");
-            }
-            let token = localStorage.getItem("token");
-            axios.get("/chatapp/" + "getGroupMembers/" + `${grpId}`, { headers: { "Authorization": token } }).then(
-                result => {
-                    //  console.log(result.data.data);
-                    addUsersToMembersList(result.data.data);
-                }
-            )
+
+        console.log("inside dikh")
+        memberList.style.display = "";
+        let grpId = localStorage.getItem('groupId') == null ? 0 : localStorage.getItem('groupId');
+        if (grpId == 0) {
+            throw new Error("No Group selected");
         }
+        let token = localStorage.getItem("token");
+        axios.get("/chatapp/" + "getGroupMembers/" + `${grpId}`, { headers: { "Authorization": token } }).then(
+            result => {
+                //  console.log(result.data.data);
+                addUsersToMembersList(result.data.data);
+            }
+        )
+
     } catch (error) {
         console.log(error)
     }
@@ -686,7 +679,7 @@ document.addEventListener("DOMContentLoaded", getGroupsForUser)
 document.addEventListener('DOMContentLoaded', getGroupsJoinRequests);
 document.addEventListener('DOMContentLoaded', showusername);
 sendMessage.addEventListener('click', sendMessages);
-groupBtn.addEventListener('click', displayGroupForm);
+//groupBtn.addEventListener('click', displayGroupForm);
 groupFormBtn.addEventListener('click', addGroup);
 inviteBtn.addEventListener('click', showInviteForm)
 submitUserInviteName.addEventListener('click', sendInvite);
