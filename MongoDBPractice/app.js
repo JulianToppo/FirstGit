@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
 const mongoConnect = require('./util/database').mongoConnect;
-//const User= require('./models/user');
-const mongoose= require('mongoose');
+const User = require('./models/user');
+const mongoose = require('mongoose');
 
 
 const app = express();
@@ -21,26 +21,37 @@ const shopRoutes = require('./routes/shop');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next) => {
-//   User.findUserById('6482f91ea85a539641d3821b')
-//     .then(user => {
-//       console.log("user",user)
-//       req.user = new User(user.name,user.email,user.cart,user._id);
-//       console.log("req.user",req.user)
-//       next();
-//     })
-//     .catch(err => console.log(err));
-// });
+app.use((req, res, next) => {
+  User.findById('649164a6ef74c7726f1e8668')
+    .then(user => {
+      req.user = user
 
- app.use('/admin', adminRoutes);
- app.use(shopRoutes);
+      next();
+    })
+    .catch(err => console.log(err));
+});
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
 app.use(errorController.get404);
 
 mongoose.connect(
   'mongodb+srv://juliantoppo95:clusterpassword@cluster0.fkmfoxf.mongodb.net/shop?retryWrites=true&w=majority'
 ).then(result => {
-  app.listen(3000);
-}).catch(err=>{
+  User.findOne().then((user) => {
+    if (!user) {
+      const user = new User({
+        name: "Julian",
+        email: "julian@gmail.com",
+        cart: {
+          items: []
+        }
+      })
+      user.save();
+    }
+    app.listen(3000)
+  })
+}).catch(err => {
   console.log(err)
 });
