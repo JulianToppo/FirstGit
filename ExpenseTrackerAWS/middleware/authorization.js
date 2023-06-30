@@ -8,8 +8,8 @@ exports.authorizationUser = async (req, res, next) => {
        // console.log("header",req.header("Authorization"));
         let token = req.header("Authorization");
         const activeUser = jwt.verify(token, "secretkey");
-        console.log("id",user.userID);
-        user.findByPk(activeUser.userID).then(result =>{
+        console.log("authorization id",activeUser.userID);
+        user.findById(activeUser.userID).then(result =>{
          //   console.log("result",result);
             req.user=result;
             next();

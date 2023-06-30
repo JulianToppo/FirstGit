@@ -6,7 +6,10 @@ const sequelize = require("../util/database");
 const AWS = require('aws-sdk');
 const { resolve } = require("path");
 const fileDownloaded = require("../model/filesDownloaded");
-const dotnet=require('dotenv').config();
+const dotnet = require('dotenv').config();
+const conn = require('../util/connection')
+const User= require('../model/user');
+const { getAddProduct } = require("../../MongoDBPractice/controllers/admin");
 
 exports.getExpensePage = (req, res, next) => {
     try {
@@ -18,9 +21,10 @@ exports.getExpensePage = (req, res, next) => {
 
 
 exports.addExpense = async (req, res, next) => {
-    const t = await sequelize.transaction();
+    // const t = await sequelize.transaction();
+    const session = await conn.startSession();
     try {
-
+        session.startTransaction();
         console.log("inside add expense");
         const { expenseAmount, description, category } = req.body;
         if (!expenseAmount) {
@@ -34,57 +38,74 @@ exports.addExpense = async (req, res, next) => {
                 }
             }
 
-            const data = await Expense.create({
+            const data = new Expense({
                 expenseAmount: expenseAmount,
                 description: description,
                 category: category,
-                registeredUserId: req.user.id
-            }, { transaction: t })
-            const totalExpense = (+req.user.totalExpense) + (+expenseAmount);
-            req.user.update({ totalExpense: totalExpense }, { transaction: t })
-                .then(async (updatedRows) => {
-                    console.log("Inside the async update");
-                    await t.commit();
-                    res.status(201).json({ NewExpenseEntry: data, success: "true" });
-                }).catch(async () => {
-                    await t.rollback();
-                    res.status(500).json({ Error: err, success: "false" });
-                })
+                userId: req.user.id
+            }, { session });
+            data.save();
 
+            const totalExpense = (+req.user.totalExpense) + (+expenseAmount);
+           // console.log(data,data._id)
+            await User.findById(req.user._id).then((product) => {
+                console.log(data)
+                product.expenses.push({expenseId:data._id});
+                // product.addExpense(data._id);
+                product.totalExpense = totalExpense
+
+                return product.save();
+            },{session}).then(async ()=>{
+                await session.commitTransaction();
+                res.status(201).json({ NewExpenseEntry: data, success: "true" });
+            })
         }
     } catch (err) {
-        await t.rollback();
+        await session.abortTransaction();
         res.status(500).json({ Error: err, success: "false" });
     }
+    session.endSession();
 }
 
 exports.getExpense = async (req, res, next) => {
     try {
         console.log("get expense entries ");
-        const pageNo= req.params.pageNo;
-        const rowCount=req.params.rowCount;
-        const totalCount= await Expense.count({
-            where:{
-                registeredUserId: req.user.id
+        const pageNo = req.params.pageNo;
+        const rowCount = req.params.rowCount;
+
+        console.log(rowCount, pageNo)
+        // const totalCount = await Expense.count({
+        //     where: {
+        //         registeredUserId: req.user.id
+        //     }
+        // });
+        const totalCount = req.user.expenses.length;
+        
+        const lastPage = (totalCount % rowCount) == 0 ? Math.floor(totalCount / rowCount) : Math.floor(totalCount / rowCount) + 1;
+        console.log("lastpage", lastPage, totalCount)
+        // const data = await Expense.findAll({
+        //     where: { registeredUserId: req.user.id },
+        //     limit: Number(rowCount),
+        //     offset: (Number(pageNo) - 1) * Number(rowCount)
+        // });
+
+        const data = await Expense.find({ userId: req.user._id })
+        .limit(rowCount)
+        .skip((Number(pageNo) - 1) * Number(rowCount))
+        .exec();
+            
+
+        console.log("expenseEntreis", data)
+        res.status(200).json({
+            ExpenseEntries: data, paginationValues: {
+                currpage: pageNo,
+                hasNext: Number(pageNo) < lastPage,
+                next: Number(pageNo) + 1,
+                hasPrevious: pageNo > 1,
+                previous: pageNo - 1,
+                last: lastPage
             }
-        });
-       // console.log(totalCount);
-               
-        const lastPage=(totalCount%rowCount)==0?Math.floor(totalCount/rowCount):Math.floor(totalCount/rowCount)+1;
-        console.log("lastpage",lastPage)
-        const data = await Expense.findAll({ 
-            where: { registeredUserId: req.user.id },
-            limit:Number(rowCount),
-            offset:(Number(pageNo)-1)*Number(rowCount)
-         });
-        res.status(200).json({ ExpenseEntries: data , paginationValues: {
-            currpage : pageNo,
-            hasNext:Number(pageNo)<lastPage,
-            next:Number(pageNo)+1,
-            hasPrevious:pageNo>1,
-            previous:pageNo-1,
-            last:lastPage
-        }})
+        })
     } catch (err) {
         res.status(500).json({ Error: err });
     }
@@ -92,35 +113,32 @@ exports.getExpense = async (req, res, next) => {
 }
 
 exports.deleteExpense = async (req, res, next) => {
-    const t = await sequelize.transaction();
+    // const t = await sequelize.transaction();
+    const session = await conn.startSession();
     try {
         console.log("inside delete expense function");
-
+        session.startTransaction();
         const expenseId = req.params.expenseId;
-
-        console.log(expenseId);
-
-        const expense = await Expense.findOne({ where: { id: expenseId } });
+        const expense = await Expense.findById(expenseId);
 
         console.log(expense.expenseAmount, req.user.totalExpense);
 
         const totalExpense = (+req.user.totalExpense) - (+expense.expenseAmount);
-        await req.user.update({ totalExpense: totalExpense }, { transaction: t });
-        const data = await Expense.destroy({
-            where: {
-                id: expenseId
-            }, transaction: t
-        });
-        await t.commit();
+        req.user.totalExpense=totalExpense;
+        await req.user.save();
+        const data = await Expense.findByIdAndDelete(expenseId,session);
+        await req.user.deleteExpenseEntry(expenseId)
+        await session.commitTransaction();
         res.status(200).json({ Delete: data });
-        // .catch(err => console.log(err));
+       
     } catch (err) {
-        await t.rollback();
+        await session.abortTransaction();
         res.status(500)
             .json({
                 error: err
             })
     }
+    session.endSession();
 }
 
 // exports.showReports= async (req,res,next)=>{
@@ -134,7 +152,7 @@ exports.deleteExpense = async (req, res, next) => {
 
 function uploadToS3(data, filename) {
     console.log("inside upload to s3");
-    const BUCKET_NAME =process.env.BUCKET_NAME;
+    const BUCKET_NAME = process.env.BUCKET_NAME;
     const IAM_USER_KEY = process.env.IAM_USER_KEY;
     const IAM_USER_SECRET = process.env.IAM_USER_SECRET
 
@@ -166,33 +184,42 @@ function uploadToS3(data, filename) {
 }
 
 exports.downloadExpense = async (req, res, next) => {
-            try {
-                console.log("inside download expense");
-                const expense = await req.user.getExpenses();
-                console.log(expense);
-                const stringyfiedExpenses = JSON.stringify(expense);
+    try {
+        console.log("inside download expense");
+        // const expense = await req.user.getExpenses();
+        const expense = await req.user.populate('expenses.expenseId').then((i)=>{
+            return i.expenses;
+        });
+        console.log(expense);
+        const stringyfiedExpenses = JSON.stringify(expense);
 
-                const userId = req.user.id;
-                const filename = `Expense${userId}/${new Date()}.txt`;
-                const fileURL = await uploadToS3(stringyfiedExpenses, filename);
+        const userId = req.user._id;
+        const filename = `Expense${userId}/${new Date()}.txt`;
+        const fileURL = await uploadToS3(stringyfiedExpenses, filename);
 
-                await fileDownloaded.create({
-                    fileURL: fileURL,
-                    registeredUserId: req.user.id
-                })
+        console.log("fileUrl",fileURL)
+        let fileDownloadedElem=await fileDownloaded.create({
+            fileURL: fileURL,
+            userId: req.user._id
+        })
 
-                res.status(200).json({ fileURL, success: true })
+        req.user.fileDownloaded.push({fileDownloadedId:fileDownloadedElem._id});
+        await req.user.save();
+        res.status(200).json({ fileURL, success: true })
 
-            } catch (error) {
-                res.status(500).json({ fileURL:'', success:'false',error: error });
-            }
-        }
+    } catch (error) {
+        res.status(500).json({ fileURL: '', success: 'false', error: error });
+    }
+}
 
-        
+
 exports.getDownloadedFiles = async (req, res, next) => {
     try {
         console.log("get downloaded files");
-        const data = await fileDownloaded.findAll({ where: { registeredUserId: req.user.id } });
+        const data = await req.user.populate('fileDownloaded.fileDownloadedId').then((val)=>{
+            return val.fileDownloaded;
+        });
+        
         res.status(200).json({ DownloadedFiles: data })
     } catch (err) {
         res.status(500).json({ Error: err });

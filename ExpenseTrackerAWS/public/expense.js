@@ -9,7 +9,7 @@ function showExpenseEntry(myObj) {
     try {
 
         let li = document.createElement("li");
-        li.id = myObj.id;
+        li.id = myObj._id;
 
 
         //adding entries made by the user
@@ -37,12 +37,12 @@ function showExpenseEntry(myObj) {
 function showDownloadedFiles(myObj) {
     try {
         let li = document.createElement("li");
-        li.id = myObj.id;
+        li.id = myObj.fileDownloadedId._id;
 
         var a = document.createElement("a");
-        a.href = myObj.fileURL;
+        a.href = myObj.fileDownloadedId.fileURL;
         a.download = 'myexpense.csv'; //filename while downloading
-        a.innerText = myObj.fileURL;
+        a.innerText = myObj.fileDownloadedId.fileURL;
 
         li.appendChild(a);
         downloadedFilesList.appendChild(li);

@@ -16,13 +16,15 @@ const getUserLeaderBoard = async (req, res) => {
         //     order:[['total_cost', 'DESC']]
 
         // })
-        const leaderboardofusers = await User.findAll({
-            attributes: ['id', 'name', 'totalExpense'],
-            order: [['totalExpense', 'DESC']]
-        })
+        // const leaderboardofusers = await User.findAll({
+        //     attributes: ['id', 'name', 'totalExpense'],
+        //     order: [['totalExpense', 'DESC']]
+        // })
 
+        const leaderboardofusers = await User.find().select('_id name totalExpense')
+            .sort({'totalExpense': 'desc'})
 
-
+            console.log(leaderboardofusers)
         res.status(200).json(leaderboardofusers)
 
     } catch (err) {

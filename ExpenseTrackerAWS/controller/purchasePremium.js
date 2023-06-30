@@ -20,7 +20,8 @@ const purchasepremium =async (req, res) => {
             if(err) {
                 throw new Error(JSON.stringify(err));
             }
-            req.user.createOrder({ orderid: order.id, status: 'PENDING'}).then(() => {
+            console.log("razorpay order")
+            Order.create({userId:req.user._id,paymentid:'', orderid: order.id, status: 'PENDING'}).then(() => {
                 return res.status(201).json({ order, key_id : rzp.key_id});
 
             }).catch(err => {
@@ -35,11 +36,12 @@ const purchasepremium =async (req, res) => {
 
  const updateTransactionStatus = async (req, res ) => {
     try {
-        const userId = req.user.id;
+        console.log("update Transaction")
+        const userId = req.user._id;
         const { payment_id, order_id} = req.body;
-        const order  = await Order.findOne({where : {orderid : order_id}}) 
-        const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}) 
-        const promise2 =  req.user.update({ ispremiumuser: true }) ;
+        const order  = await Order.findOne({ orderid : order_id}) 
+        const promise1 =  await order.updateOne({ paymentid: payment_id, status: 'SUCCESSFUL'}) 
+        const promise2 =await   req.user.updateOne({ ispremiumuser: true }) ;
 
         Promise.all([promise1, promise2]).then(()=> {
             return res.status(202).json({success: true, message: "Transaction Successful", token: loginSignUpController.generateToken(userId,true) });

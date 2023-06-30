@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mail = require('../middleware/sendMails');
 const { v4: uuidv4 } = require('uuid');
+const User = require('../model/user');
 
 
 var generateToken = (id, ispremiumuser) => {
@@ -36,13 +37,11 @@ var loginUser = async (req, res, next) => {
             }
         }
 
-        var data = await user.findAll({
-            where: {
-                email: email
-            }
+        var data = await user.find({
+            email: email
         })
 
-
+        console.log(data);
         if (data.length >= 1) {
 
             bcrypt.compare(password, data[0].password, (err, result) => {
@@ -57,8 +56,8 @@ var loginUser = async (req, res, next) => {
 
                 // if (data.length>=1) {
                 if (result === true) {
-
-                    res.status(201).json({ Message: "User login sucessful", success: "true", token: generateToken(data[0].id, false) });
+                    
+                    res.status(201).json({ Message: "User login sucessful", success: "true", token: generateToken(data[0]._id, false) });
 
                 }
                 else {
@@ -107,13 +106,20 @@ var postSignUpEntry = async (req, res, next) => {
             const saltRounds = 10;
             const pass = await bcrypt.hash(password, saltRounds)
 
-            const data = await user.create({
+            //changing to nosql
+            // const data = await user.create({
+            const data = new User({
                 name: name,
                 email: email,
                 password: pass,
-                ispremiumuser: false
+                ispremiumuser: false,
+                orders: [],
+                totalExpense: 0,
+                expenses: [],
+                fileDownloaded: [],
+                forgotPasswordRequests: []
             })
-
+            data.save();
             res.status(201).json({ NewUser: data, success: "true" });
         }
     } catch (err) {
@@ -136,23 +142,20 @@ var forgotPassword = async (req, res, next) => {
         const email = req.body.emailId;
 
         const currUser = await user.findOne({
-            where: {
                 email: email
-            }
         })
-
+        console.log(currUser)
         const uniqueId = uuidv4();;
-        await forgotPasswordRequests.create({
+        let newforgotUser= await forgotPasswordRequests.create({
             id: uniqueId,
-            userId: currUser.id,
+            userId: currUser._id,
             isactive: true,
-            registeredUserId: currUser.id
-
         })
 
-        const message = process.env.HOST_IPADDRESS+ '/password/resetpassword/' + uniqueId;
-
-        console.log("message",message);
+        currUser.forgotPasswordRequests.push({forgotPasswordRequestsId:newforgotUser._id})
+        const message = process.env.HOST_IPADDRESS + '/password/resetpassword/' + newforgotUser._id.toString();
+        
+        console.log("message", message);
 
         console.log("email", email);
         mail.sendMails(email, message);
@@ -170,14 +173,13 @@ var forgotPassword = async (req, res, next) => {
 var resetPassword = async (req, res, next) => {
     try {
         const id = req.params.id;
-
+        console.log(id);
         const userFound = await forgotPasswordRequests.findOne({
-            where: {
-                id: id,
+                _id: id,
                 isactive: true
-            }
-        });
-
+            });
+        
+        console.log("userFound",userFound)
         if (userFound) {
             res.sendFile(path.join(__dirname, "..", "view", "resetPassword.html"))
         } else {
@@ -192,35 +194,36 @@ var resetPassword = async (req, res, next) => {
 
 var updatePassword = async (req, res, next) => {
     try {
-
-        let email= req.body.email;
-        let password= req.body.password;
+        console.log("inside update password")
+        let email = req.body.email;
+        let password = req.body.password;
 
         const userFound = await user.findOne({
-            where: {
-               email:email
-            }
+                email: email
         });
 
-        if(userFound){
-        const resetUserFound = await forgotPasswordRequests.findOne({
-            where: {
-                userId: userFound.id
-            }
-        });
+        console.log("userFound",userFound)
 
-        await resetUserFound.update({isactive:false});
-       
+        if (userFound) {
+            const resetUserFound = await forgotPasswordRequests.findOne({
+                    userId: userFound._id,
+                    isactive:true
+            });
+            console.log("resetUserFond",resetUserFound)
+            resetUserFound.isactive=false;
+            await resetUserFound.save();
 
-        let saltRounds=10;
-        let newPassword= await bcrypt.hash(password,saltRounds);
-        await userFound.update({password:newPassword});
 
-        res.status(200).json({Message : "Password has been updated" , success: true});
-    }
-    else{
-        throw new Error('No User Found with this email');
-    }
+            let saltRounds = 10;
+            let newPassword = await bcrypt.hash(password, saltRounds);
+            userFound.password=newPassword;
+            await userFound.save();
+
+            res.status(200).json({ Message: "Password has been updated", success: true });
+        }
+        else {
+            throw new Error('No User Found with this email');
+        }
 
     } catch (error) {
         res.status(500).json({ Error: error });
