@@ -42,20 +42,20 @@ exports.addExpense = async (req, res, next) => {
                 expenseAmount: expenseAmount,
                 description: description,
                 category: category,
-                userId: req.user.id
-            }, { session });
+                userId: req.user._id
+            }, { session:session });
             data.save();
 
             const totalExpense = (+req.user.totalExpense) + (+expenseAmount);
            // console.log(data,data._id)
-            await User.findById(req.user._id).then((product) => {
+            await User.findById(req.user._id).session(session).then((product) => {
                 console.log(data)
                 product.expenses.push({expenseId:data._id});
                 // product.addExpense(data._id);
                 product.totalExpense = totalExpense
 
                 return product.save();
-            },{session}).then(async ()=>{
+            }).then(async ()=>{
                 await session.commitTransaction();
                 res.status(201).json({ NewExpenseEntry: data, success: "true" });
             })
@@ -119,6 +119,7 @@ exports.deleteExpense = async (req, res, next) => {
         console.log("inside delete expense function");
         session.startTransaction();
         const expenseId = req.params.expenseId;
+        console.log(expenseId)
         const expense = await Expense.findById(expenseId);
 
         console.log(expense.expenseAmount, req.user.totalExpense);
@@ -126,8 +127,8 @@ exports.deleteExpense = async (req, res, next) => {
         const totalExpense = (+req.user.totalExpense) - (+expense.expenseAmount);
         req.user.totalExpense=totalExpense;
         await req.user.save();
-        const data = await Expense.findByIdAndDelete(expenseId,session);
-        await req.user.deleteExpenseEntry(expenseId)
+        const data = await Expense.findByIdAndDelete(expenseId,{session:session});
+        await req.user.deleteExpenseEntry(expenseId,{session:session})
         await session.commitTransaction();
         res.status(200).json({ Delete: data });
        

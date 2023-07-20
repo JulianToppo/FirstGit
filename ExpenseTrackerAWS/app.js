@@ -65,6 +65,7 @@ app.use((req,res)=>{
     res.sendFile(path.join(__dirname,"view",`${url}`))
 });
 //sql sync 
+//force:true
 // sequelize.sync().then(result => {
 //     // console.log(result);
 //     app.listen(3000);

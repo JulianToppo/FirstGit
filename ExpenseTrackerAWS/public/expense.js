@@ -8,26 +8,39 @@ var showExpenses = document.getElementById('showExpenses');
 function showExpenseEntry(myObj) {
     try {
 
-        let li = document.createElement("li");
-        li.id = myObj._id;
+        // let li = document.createElement("li");
+        // li.id = myObj._id;
+        // li.classList ="list-group-item px-3 border-0";
 
+          // Create row element
+      let row = document.createElement("tr")
+      row.id=myObj._id
+      
+      // Create cells
+      let c1 = document.createElement("td")
+      let c2 = document.createElement("td")
+      let c3 = document.createElement("td")
+      let c4 = document.createElement("td")
 
         //adding entries made by the user
-        li.appendChild(document.createTextNode(myObj.expenseAmount));
-        li.appendChild(document.createTextNode(" "));
-        li.appendChild(document.createTextNode(myObj.description));
-        li.appendChild(document.createTextNode(" "));
-        li.appendChild(document.createTextNode(myObj.category));
+        c1.innerText = myObj.expenseAmount
+        c2.innerText = myObj.description
+        c3.innerText = myObj.category
 
 
         //Delete button
         var delBtn = document.createElement('button');
         delBtn.id = "deleteBtn";
-        delBtn.className = "delete";
+        delBtn.classList = "delete btn btn-warning";
         delBtn.appendChild(document.createTextNode('DELETE'));
 
-        li.appendChild(delBtn);
-        expenseList.appendChild(li);
+        c4.appendChild(delBtn);
+        row.appendChild(c1);
+        row.appendChild(c2);
+        row.appendChild(c3);
+        row.appendChild(c4);
+
+        expenseList.appendChild(row);
 
     } catch (err) {
         console.log(err);
@@ -181,23 +194,25 @@ const deleteItems = async (e) => {
 
     try {
         console.log('Inside delete function')
-        e.preventDefault(e);
+        e.preventDefault();
         if (e.target.classList.contains('delete')) {
             if (confirm('Are you sure?')) {
-                var li = e.target.parentElement;
-
+                var li = e.target.parentElement.parentElement;
+                console.log(li.id)
+                console.log("inside")
                 //localStorage.removeItem(li.id);
 
                 let token = localStorage.getItem("token");
-                axios.delete("/expense/" + li.id, { headers: { "Authorization": token } })
+                await axios.delete("/expense/" + li.id, { headers: { "Authorization": token } })
                     .then(
                         (result) => {
                             console.log("Entry Deleted")
                             console.log(result.data.Delete);
+                            li.remove(); 
                         }
                     )
 
-                expenseList.removeChild(li);
+                
             }
         }
     }
@@ -227,7 +242,8 @@ const buyPremiumMembership = async (e) => {
                 console.log(res)
                 alert('You are a Premium User Now')
                 //hide the button and show premium user
-                document.getElementById('buyMembership').style.visibility = "hidden"
+                document.getElementById('buyMembership').style.display = "none"
+                
                 document.getElementById('message').innerHTML = "You are a premium user ";
                 localStorage.setItem('token', res.data.token);
                 showLeaderboard();
@@ -255,7 +271,7 @@ function checkIfPremium(e) {
             .then(response => {
                 console.log(response.data);
                 if (response.data.success === true) {
-                    document.getElementById('buyMembership').style.visibility = "hidden"
+                    document.getElementById('buyMembership').style.display = "none"
                     document.getElementById('message').innerHTML = "You are a premium user ";
                     showLeaderboard();
                 }
@@ -281,7 +297,7 @@ function showLeaderboard() {
                 leaderboardElem.removeChild(leaderboardElem.firstChild);
             }
 
-            leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
+            leaderboardElem.innerHTML += '<h1 class="display-4" style="text-align:center;"> Leader Board </<h1>'
             userLeaderBoardArray.data.forEach((userDetails) => {
                 leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.totalExpense || 0} </li>`
             })
@@ -293,20 +309,6 @@ function showLeaderboard() {
     }
 
 }
-
-// function showDaily_Monthly_YearlyExpense(){
-//     try {
-//         let btn= document.createElement('button');
-//         btn.id="showDailyMonthlyYearlyExpense";
-//         btn.value="Show Reports";
-//         btn.onclick= async() => {
-//             window.location="/showReports";
-
-//         }
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
 
 async function download() {
     const token = localStorage.getItem('token')
@@ -320,7 +322,7 @@ async function download() {
                 a.click();
 
                 showDownloadedFiles(response.data);
-                //window.location.reload();
+                window.location.reload();
 
 
             } else {
