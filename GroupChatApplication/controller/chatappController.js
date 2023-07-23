@@ -283,7 +283,8 @@ var getRequestList = async (req, res, next) => {
         await inviteRequests.findAll({
             where: {
                 userId: req.user.id
-            }
+            },
+            include:groupTB
         }).then(result => {
             res.status(200).json({ data: result, status: true })
         })
