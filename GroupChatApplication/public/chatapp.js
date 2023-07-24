@@ -21,17 +21,18 @@ const membersBtn = document.getElementById('membersBtn')
 
 socket.on('deleteGroupChat', async (data) => {
     try {
-        console.log("deletegorupchat")
+        console.log("deletegroupchat")
         let token = localStorage.getItem('token')
         let id = await axios.get("http://localhost:3000/chatapp/getId", { headers: { "Authorization": token } });
         if ((id.data.data.id == data.deleteduserid) && (localStorage.getItem("groupId") == data.deletedGpId)) {
             localStorage.removeItem("groupId");
             localStorage.removeItem("oldmessages");
+            getGroupsForUser();
+            messageQueue.innerHTML="";
+            loadMessages();
+            document.getElementById("activeGroup").innerHTML='';
             alert("Group modifications")
-            window.location.reload();
-        }
-
-        loadMessages();
+        }      
     } catch (error) {
         console.log(error);
     }
@@ -55,8 +56,8 @@ socket.on("pendingRequestCheck", (data) => {
         let actUser = document.getElementById('activeUser').innerHTML;
         //console.log(actUser,username)
         if (data.username == actUser) {
+            getGroupsJoinRequests();
             alert("Check pending requests!");
-            window.location.reload();
 
         }
     } catch (error) {
@@ -512,6 +513,7 @@ var showPendingRequests = (e) => {
 //Display the pending requests to be answered
 var addJoinRequest = (listOfRequests) => {
     try {
+        pendingRequestsList.innerHTML="";
         let setOfGroupIDForRequests = new Set();
         listOfRequests.forEach(async element => {
 

@@ -1,6 +1,6 @@
 const path = require('path')
 const messagesTB = require('../model/messages')
-const archiveChats=require('../model/archivedChat')
+const archiveChats = require('../model/archivedChat')
 const UserTB = require('../model/user')
 const groupTB = require('../model/groups')
 const { Op } = require("sequelize");
@@ -205,7 +205,7 @@ var addGroup = async (req, res, next) => {
                 userId: req.user.id,
                 groupId: result.id
             })
-          
+
             if (adminEntry.length < 1) {
 
                 res.status(500).json({ Error: adminEntry, status: false })
@@ -284,7 +284,7 @@ var getRequestList = async (req, res, next) => {
             where: {
                 userId: req.user.id
             },
-            include:groupTB
+            include: groupTB
         }).then(result => {
             res.status(200).json({ data: result, status: true })
         })
