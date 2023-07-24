@@ -37,14 +37,15 @@ Here're some of the project's best features:
 <h2>🛠️ Installation Steps:</h2>
 
 <p>1. Clone the repository</p>
+<p>2. Set the environment variables</p>
 
-<p>2. Install node dependencies</p>
+<p>3. Install node dependencies</p>
 
 ```
 npm install
 ```
 
-<p>3. Start the server</p>
+<p>4. Start the server</p>
 
 ```
 npm start
